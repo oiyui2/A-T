@@ -1,4 +1,3 @@
-
 // ============================================================
 //  전역 변수 (Global Variables)
 // ============================================================
@@ -43,7 +42,7 @@ function draw() {
 }
 
 // ============================================================
-//  3. 별똥별 관련 함수 (추후수정)
+//  3. 별똥별 관련 함수
 // ============================================================
 
 // 별 하나 생성
@@ -305,11 +304,56 @@ function drawTodoItems() {
 }
 
 // ============================================================
-// 11. 상태 텍스트 (임시)
+// 11. 미니 캐릭터..? (완료율에 따라 변화)
 // ============================================================
 
-function drawCharacter(ratio) {
-  
+function drawMiniCharacter(ratio) {
+  let cx = width - 120;
+  let cy = height - 150;
+  let bounce = sin(frameCount * 0.05) * 5;
+
+  // 몸통
+  noStroke();
+  let bodyColor = lerpColor(color(180, 130, 200), color(100, 230, 180), ratio);
+  fill(bodyColor);
+  ellipse(cx, cy + bounce, 60 + ratio * 20, 60 + ratio * 20);
+
+  // 눈
+  fill(40);
+  let eyeY = cy + bounce - 5;
+  if (ratio < 0.3) {
+    // 졸린 눈 (─ ─)
+    stroke(40);
+    strokeWeight(2);
+    line(cx - 12, eyeY, cx - 4, eyeY);
+    line(cx + 4, eyeY, cx + 12, eyeY);
+    noStroke();
+  } else {
+    // 또렷한 눈 (● ●)
+    ellipse(cx - 8, eyeY, 6, 6);
+    ellipse(cx + 8, eyeY, 6, 6);
+  }
+
+  // 입
+  if (ratio >= 0.8) {
+    // 활짝 웃는 입 :D
+    fill(60);
+    arc(cx, cy + bounce + 8, 20, 14, 0, PI, CHORD);
+  } else if (ratio >= 0.3) {
+    // 미소 :)
+    noFill();
+    stroke(40);
+    strokeWeight(2);
+    arc(cx, cy + bounce + 6, 14, 8, 0, PI);
+    noStroke();
+  } else {
+    // 찡그린 입 :(
+    noFill();
+    stroke(40);
+    strokeWeight(2);
+    arc(cx, cy + bounce + 14, 14, 8, PI, TWO_PI);
+    noStroke();
+  }
 
   // 상태 텍스트
   fill(200, 180, 255);
