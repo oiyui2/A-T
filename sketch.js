@@ -107,38 +107,38 @@ let creatorSchool = "";
 function preload() {
   // 0번 캐릭터: 불
   characters[0] = [
-    loadImage("1단계불.png"),
-    loadImage("2단계불.png"),
-    loadImage("3단계불.png"),
-    loadImage("4단계불.png"),
-    loadImage("5단계불.png")
+    loadImage("images/1단계불.png"),
+    loadImage("images/2단계불.png"),
+    loadImage("images/3단계불.png"),
+    loadImage("images/4단계불.png"),
+    loadImage("images/5단계불.png")
   ];
 
   // 1번 캐릭터: 구름
   characters[1] = [
-    loadImage("1단계구름.png"),
-    loadImage("2단계구름.png"),
-    loadImage("3단계구름.png"),
-    loadImage("4단계구름.png"),
-    loadImage("5단계구름.png")
+    loadImage("images/1단계구름.png"),
+    loadImage("images/2단계구름.png"),
+    loadImage("images/3단계구름.png"),
+    loadImage("images/4단계구름.png"),
+    loadImage("images/5단계구름.png")
   ];
 
   // 2번 캐릭터: 유령
   characters[2] = [
-    loadImage("1단계유령.png"),
-    loadImage("2단계유령.png"),
-    loadImage("3단계유령.png"),
-    loadImage("4단계유령.png"),
-    loadImage("5단계유령.png")
+    loadImage("images/1단계유령.png"),
+    loadImage("images/2단계유령.png"),
+    loadImage("images/3단계유령.png"),
+    loadImage("images/4단계유령.png"),
+    loadImage("images/5단계유령.png")
   ];
 
   // 3번 캐릭터: 구
   characters[3] = [
-    loadImage("1단계구.png"),
-    loadImage("2단계구.png"),
-    loadImage("3단계구.png"),
-    loadImage("4단계구.png"),
-    loadImage("5단계구.png")
+    loadImage("images/1단계구.png"),
+    loadImage("images/2단계구.png"),
+    loadImage("images/3단계구.png"),
+    loadImage("images/4단계구.png"),
+    loadImage("images/5단계구.png")
   ];
 
   // 4번 캐릭터 (아직 파일 없으면 임시로 0번 사용)
