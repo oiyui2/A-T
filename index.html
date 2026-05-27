@@ -1,34 +1,37 @@
 <!DOCTYPE html>
 <html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>2DO</title>
+  <title>2DO</title>
 
-    <!-- p5.js: 한 번만 불러오기 -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <!-- p5.js 기본 라이브러리 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
 
-    <!-- p5.sound: 음악 파일 사용할 때 필요 -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/addons/p5.sound.min.js"></script>
+  <!-- p5.sound 라이브러리: loadSound() 쓰려면 필요 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/addons/p5.sound.min.js"></script>
 
-    <style>
-      html,
-      body {
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-        background: #140a32;
-      }
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: #140a32;
+    }
 
-      canvas {
-        display: block;
-      }
-    </style>
-  </head>
+    canvas {
+      display: block;
+    }
 
-  <body>
-    <!-- sketch.js는 딱 한 번만 불러오기 -->
-    <script src="sketch.js"></script>
-  </body>
+    input, button {
+      font-family: Arial, sans-serif;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 내가 만든 p5.js 코드 -->
+  <script src="sketch.js"></script>
+</body>
 </html>
