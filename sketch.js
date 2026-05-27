@@ -13,15 +13,14 @@
 // ============================================================
 
 
-// ============================================================
 // 전역 변수
 // ============================================================
 
 let currentPage = "input";
-// input  : 할 일 입력 화면
-// main   : 캐릭터 성장 + 할 일 체크 화면
-// result : 오늘 결과 저장 화면
-// music  : 곡 플레이 화면
+// "input"  : 할 일 입력 화면
+// "main"   : 캐릭터 성장 + 할 일 체크 화면
+// "result" : 오늘 결과 저장 화면
+// "music"  : 곡 플레이 화면
 
 // 캐릭터 이미지
 // characters[캐릭터번호][성장단계]
@@ -37,6 +36,8 @@ let finalBurst = 0;
 
 // 별 배경
 let stars = [];
+
+let songSounds = [];
 
 // 할 일 관련
 let todoList = [];
@@ -57,7 +58,7 @@ let saveImageButton;
 let musicPageButton;
 let restartButton;
 let backToMainButton;
-
+let stopMusicButton;
 let inventoryCount = 0;
 let rewardClaimed = false;
 
@@ -107,44 +108,47 @@ let creatorSchool = "";
 function preload() {
   // 0번 캐릭터: 불
   characters[0] = [
-    loadImage("images/1단계불.png"),
-    loadImage("images/2단계불.png"),
-    loadImage("images/3단계불.png"),
-    loadImage("images/4단계불.png"),
-    loadImage("images/5단계불.png")
+    loadImage("1단계불.png"),
+    loadImage("2단계불.png"),
+    loadImage("3단계불.png"),
+    loadImage("4단계불.png"),
+    loadImage("5단계불.png")
   ];
 
   // 1번 캐릭터: 구름
   characters[1] = [
-    loadImage("images/1단계구름.png"),
-    loadImage("images/2단계구름.png"),
-    loadImage("images/3단계구름.png"),
-    loadImage("images/4단계구름.png"),
-    loadImage("images/5단계구름.png")
+    loadImage("1단계구름.png"),
+    loadImage("2단계구름.png"),
+    loadImage("3단계구름.png"),
+    loadImage("4단계구름.png"),
+    loadImage("5단계구름.png")
   ];
 
   // 2번 캐릭터: 유령
   characters[2] = [
-    loadImage("images/1단계유령.png"),
-    loadImage("images/2단계유령.png"),
-    loadImage("images/3단계유령.png"),
-    loadImage("images/4단계유령.png"),
-    loadImage("images/5단계유령.png")
+    loadImage("1단계유령.png"),
+    loadImage("2단계유령.png"),
+    loadImage("3단계유령.png"),
+    loadImage("4단계유령.png"),
+    loadImage("5단계유령.png")
   ];
 
   // 3번 캐릭터: 구
   characters[3] = [
-    loadImage("images/1단계구.png"),
-    loadImage("images/2단계구.png"),
-    loadImage("images/3단계구.png"),
-    loadImage("images/4단계구.png"),
-    loadImage("images/5단계구.png")
+    loadImage("1단계구.png"),
+    loadImage("2단계구.png"),
+    loadImage("3단계구.png"),
+    loadImage("4단계구.png"),
+    loadImage("5단계구.png")
   ];
 
-  // 4번 캐릭터 (아직 파일 없으면 임시로 0번 사용)
-  characters[4] = characters[0];
+  songSounds[0] = loadSound("song1.mp3");
+// songSounds[1] = loadSound("song2.mp3");
+// songSounds[2] = loadSound("song3.mp3");
+// songSounds[3] = loadSound("song4.mp3");
+// songSounds[4] = loadSound("song5.mp3");
+// songSounds[5] = loadSound("song6.mp3");
 }
-
 
 // ============================================================
 // setup
@@ -196,8 +200,9 @@ function draw() {
 function buildInputPageUI() {
   inputBox = createInput("");
   inputBox.attribute("placeholder", "할 일을 입력하세요");
-  inputBox.style("font-size", "18px");
-  inputBox.style("padding", "12px 16px");
+  inputBox.style("font-size", "16px");
+  inputBox.style("padding", "6px 16px");
+  inputBox.style("box-sizing", "border-box");
   inputBox.style("border", "2px solid #7c5cbf");
   inputBox.style("border-radius", "12px");
   inputBox.style("outline", "none");
@@ -206,7 +211,9 @@ function buildInputPageUI() {
   inputBox.style("color", "#222");
 
   inputBox.elt.addEventListener("keydown", function(e) {
-    if (e.key === "Enter") addTodo();
+    if (e.key === "Enter") {
+      addTodo();
+    }
   });
 
   addButton = createButton("추가");
@@ -254,6 +261,10 @@ function buildMusicPageUI() {
   backToMainButton = createButton("결과 화면으로");
   styleButton(backToMainButton, "#7c5cbf");
   backToMainButton.mousePressed(goBackToResultPage);
+
+  stopMusicButton = createButton("노래 멈추기");
+  styleButton(stopMusicButton, "#555");
+  stopMusicButton.mousePressed(stopAllSongs);
 }
 
 function styleButton(btn, bgColor) {
@@ -287,7 +298,7 @@ function hideAllUI() {
   if (restartButton) restartButton.hide();
 
   if (backToMainButton) backToMainButton.hide();
-
+  if (stopMusicButton) stopMusicButton.hide();
   closeTimerPanelDOM();
   timerPanelOpen = false;
   timerPanelIndex = -1;
@@ -295,6 +306,7 @@ function hideAllUI() {
 
 function showOnlyInputUI() {
   hideAllUI();
+
   inputBox.show();
   addButton.show();
   completeButton.show();
@@ -305,11 +317,13 @@ function showOnlyInputUI() {
 
 function showOnlyMainUI() {
   hideAllUI();
+
   resultButton.show();
 }
 
 function showOnlyResultUI() {
   hideAllUI();
+
   saveImageButton.show();
   musicPageButton.show();
   restartButton.show();
@@ -318,16 +332,39 @@ function showOnlyResultUI() {
 
 function showOnlyMusicUI() {
   hideAllUI();
+
   backToMainButton.show();
+  stopMusicButton.show();
 }
 
 function positionUI() {
   if (currentPage === "input") {
-    inputBox.position(width / 2 - 230, height * 0.44);
-    addButton.position(width / 2 + 135, height * 0.44);
-    completeButton.position(width / 2 - 80, height * 0.54);
-    loadButton.position(width / 2 - 85, height * 0.62);
-    resetAllButton.position(width / 2 - 60, height * 0.70);
+    // 왼쪽 입력 영역
+    let inputW = min(500, width * 0.45);
+    let inputH = 42;
+    let addW = 105;
+    let gap = 14;
+
+    // 전체 중앙보다 살짝 왼쪽으로 이동
+    let groupW = inputW + gap + addW;
+    let groupX = width * 0.36 - groupW / 2;
+    let inputY = height * 0.34;
+
+    inputBox.size(inputW, inputH);
+    addButton.size(addW, inputH);
+
+    inputBox.position(groupX, inputY);
+    addButton.position(groupX + inputW + gap, inputY);
+
+    // 버튼들도 왼쪽 입력 영역 기준으로 정렬
+    completeButton.size(230, 58);
+    loadButton.size(260, 58);
+    resetAllButton.size(210, 58);
+
+    completeButton.position(width * 0.36 - 115, height * 0.48);
+    loadButton.position(width * 0.36 - 130, height * 0.59);
+    resetAllButton.position(width * 0.36 - 105, height * 0.70);
+
     fullscreenButton.position(width - 150, 30);
   }
 
@@ -343,11 +380,10 @@ function positionUI() {
   }
 
   if (currentPage === "music") {
-    backToMainButton.position(width - 180, height - 80);
-  }
+  backToMainButton.position(width - 180, height - 80);
+  stopMusicButton.position(width - 360, height - 80);
 }
-
-
+}
 // ============================================================
 // 전체화면
 // ============================================================
@@ -365,54 +401,103 @@ function turnOnFullscreen() {
 function drawInputPage() {
   drawGradientBG(color(20, 10, 50), color(60, 20, 80));
 
+  // 제목
   fill(255);
   textStyle(BOLD);
-  textSize(min(width, height) * 0.10);
-  text("2DO", width / 2, height * 0.18);
+  textSize(min(width, height) * 0.060);
+  text("2DO", width / 2, height * 0.10);
 
+  // 부제목
   textStyle(NORMAL);
-  textSize(min(width, height) * 0.04);
-  text("할 일을 완수할수록 캐릭터가 성장하는 투두리스트", width / 2, height * 0.31);
+  textSize(min(width, height) * 0.028);
+  text(
+    "할 일을 완수할수록 캐릭터가 성장하는 투두리스트",
+    width / 2,
+    height * 0.17
+  );
 
+  // 안내문
   fill(220, 210, 255);
-  textSize(min(width, height) * 0.025);
-  text("오늘의 할 일을 최소 4개, 최대 8개까지 입력하세요.", width / 2, height * 0.38);
+  textSize(min(width, height) * 0.020);
+  text(
+    "오늘의 할 일을 최소 4개, 최대 8개까지 입력하세요.",
+    width / 2,
+    height * 0.24
+  );
 
+  // 현재 개수
   fill(255);
-  textSize(min(width, height) * 0.022);
-  text("현재 입력된 할 일: " + todoList.length + "개", width / 2, height * 0.78);
+  textSize(min(width, height) * 0.024);
+  text(
+    "현재 입력된 할 일: " + todoList.length + "개",
+    width / 2,
+    height * 0.78
+  );
 
+  // 메시지
   if (messageText !== "") {
     fill(255, 180, 200);
-    textSize(min(width, height) * 0.020);
+    textSize(min(width, height) * 0.018);
     text(messageText, width / 2, height * 0.83);
   }
 
   drawInputTodoPreview();
 
+  // 제작자
   fill(220, 210, 255);
   textSize(16);
   textAlign(RIGHT, CENTER);
   text(creatorNames, width - 40, height - 40);
   textAlign(CENTER, CENTER);
 }
-
 function drawInputTodoPreview() {
+  // 오른쪽 목록 박스 위치 조정
+  let boxW = min(330, width * 0.24);
+  let boxH = 310;
+
+  // 기존보다 오른쪽으로 이동
+  let boxX = width * 0.79;
+  let boxY = height * 0.30;
+
+  // 목록 박스
+  noStroke();
+  fill(255, 255, 255, 35);
+  rect(boxX - boxW / 2, boxY, boxW, boxH, 18);
+
+  // 제목
+  fill(255);
+  textAlign(LEFT, CENTER);
+  textSize(20);
+  text("입력한 할 일", boxX - boxW / 2 + 24, boxY + 42);
+
+  // 개수
+  fill(220, 210, 255);
+  textSize(14);
+  textAlign(RIGHT, CENTER);
+  text(todoList.length + " / 8개", boxX + boxW / 2 - 24, boxY + 42);
+
   if (todoList.length === 0) {
     fill(170, 150, 200);
-    textSize(16);
-    text("아직 입력된 할 일이 없습니다.", width / 2, height * 0.88);
+    textAlign(LEFT, CENTER);
+    textSize(15);
+    text("아직 입력된 할 일이 없습니다.", boxX - boxW / 2 + 24, boxY + 90);
+    textAlign(CENTER, CENTER);
     return;
   }
 
-  fill(255);
-  textSize(18);
+  // 할 일 목록
+  textAlign(LEFT, CENTER);
+  textSize(15);
 
   for (let i = 0; i < todoList.length; i++) {
-    text((i + 1) + ". " + todoList[i].title, width / 2, height * 0.88 + i * 26);
-  }
-}
+    let y = boxY + 86 + i * 26;
 
+    fill(255);
+    text((i + 1) + ". " + todoList[i].title, boxX - boxW / 2 + 24, y);
+  }
+
+  textAlign(CENTER, CENTER);
+}
 function addTodo() {
   let textValue = inputBox.value().trim();
 
@@ -455,6 +540,7 @@ function goToMainPage() {
     return;
   }
 
+  // 저장 기록을 불러온 상태가 아니면 새 캐릭터 랜덤 선택
   if (!loadedFromSave) {
     selectedCharacterIndex = floor(random(characters.length));
   }
@@ -510,12 +596,11 @@ function drawMainCharacter() {
   let doneCount = countDone();
   let stageIndex = getStageIndex(doneCount, todoList.length);
 
-  // 메인 캐릭터 위치 (위로 올림)
   let charX = width * 0.22;
-  let charY = height * 0.27;
+  let charY = height * 0.42;
 
-  // 메인 캐릭터 2배 가까이 확대하되 너무 과하지 않게 조정
-  let charSize = min(width, height) * 0.58;
+  // 기존 min(width, height) * 0.34의 2배
+  let charSize = min(width, height) * 0.68;
 
   let angle = 0;
   let squash = 1;
@@ -531,8 +616,8 @@ function drawMainCharacter() {
   }
 
   noStroke();
-  fill(200, 210, 220, 70);
-  ellipse(charX, charY + charSize * 0.42, charSize * 0.50, charSize * 0.07);
+  fill(200, 210, 220, 90);
+  ellipse(charX, charY + charSize * 0.2, charSize * 0.58, charSize * 0.08);
 
   push();
   translate(charX, charY);
@@ -544,12 +629,12 @@ function drawMainCharacter() {
   fill(220, 210, 255);
   noStroke();
   textSize(22);
-  text("현재 " + (stageIndex + 1) + "단계", charX, charY + charSize * 0.55);
+  text("현재 " + (stageIndex + 1) + "단계", charX, charY + charSize * 0.38);
 
   if (!characterAnimating) {
     fill(255, 180, 200);
     textSize(16);
-    text("타이머 종료로 캐릭터가 멈췄습니다.", charX, charY + charSize * 0.63);
+    text("타이머 종료로 캐릭터가 멈췄습니다.", charX, charY + charSize * 0.46);
   }
 }
 
@@ -563,6 +648,7 @@ function getTodoLayout() {
   let listY = height * 0.30;
   let listW = width * 0.23;
 
+  // 할 일이 많을 때도 화면 안에 들어오도록 줄 간격 자동 조절
   let rowGap = min(70, (height * 0.48) / max(todoList.length - 1, 1));
   rowGap = max(rowGap, 52);
 
@@ -598,7 +684,6 @@ function drawTodoPanel() {
     let y = listY + i * rowGap;
     let todo = todoList[i];
 
-    // 체크박스
     stroke(230);
     strokeWeight(1.5);
     fill(255);
@@ -611,18 +696,15 @@ function drawTodoPanel() {
       line(listX + 11, y + 7, listX + 20, y - 7);
     }
 
-    // 밑줄
     stroke(220, 210, 255, 160);
     strokeWeight(1);
     line(listX + 42, y, listX + listW, y);
 
-    // 할 일 제목
     noStroke();
     fill(todo.done ? color(170, 220, 180) : color(255));
     textSize(20);
     text(todo.title, listX + 48, y - 18);
 
-    // 타이머 버튼
     drawTimerBox(i, listX + listW + 38, y);
 
     let t = todo.timer;
@@ -732,6 +814,7 @@ function drawPenaltyEffect(index, x, y) {
     if (p.index !== index) continue;
 
     let elapsed = frameCount - p.startFrame;
+
     if (elapsed > 60) continue;
 
     let alpha = map(elapsed, 0, 60, 200, 0);
@@ -773,13 +856,17 @@ function openTimerPanel(index) {
 
   closeTimerPanelDOM();
 
-  let px = width / 2 - 180;
-  let py = height / 2 - 145;
+  // 패널 크기 넓힘
+  let pw = 520;
+  let ph = 420;
+  let px = width / 2 - pw / 2;
+  let py = height / 2 - ph / 2;
 
+  // 탭 버튼
   durationBtn = createButton("⏱ 시간 설정");
   styleTimerTabBtn(durationBtn, true);
-  durationBtn.position(px + 24, py + 24);
-  durationBtn.size(140, 36);
+  durationBtn.position(px + 40, py + 34);
+  durationBtn.size(200, 44);
   durationBtn.mousePressed(function() {
     timerMode = "duration";
     updateTabStyle();
@@ -787,81 +874,99 @@ function openTimerPanel(index) {
 
   deadlineBtn = createButton("🕐 종료 시각");
   styleTimerTabBtn(deadlineBtn, false);
-  deadlineBtn.position(px + 196, py + 24);
-  deadlineBtn.size(140, 36);
+  deadlineBtn.position(px + 280, py + 34);
+  deadlineBtn.size(200, 44);
   deadlineBtn.mousePressed(function() {
     timerMode = "deadline";
     updateTabStyle();
   });
 
-  let rowY = py + 100;
+  // 시 / 분 / 초 입력 그룹
+  let rowY = py + 150;
 
+  let hourX = px + 95;
+  let minX = px + 260;
+  let secX = px + 425;
+
+  // 시
   hourMinusBtn = createButton("-");
   styleStepperButton(hourMinusBtn);
-  hourMinusBtn.position(px + 38, rowY);
+  hourMinusBtn.position(hourX - 58, rowY);
+  hourMinusBtn.size(38, 42);
   hourMinusBtn.mousePressed(function() {
     adjustTimerValue("hour", -1);
   });
 
   hourInput = createInput(str(timerHour));
   styleTimerInput(hourInput);
-  hourInput.position(px + 78, rowY);
-  hourInput.size(54, 36);
+  hourInput.position(hourX - 15, rowY);
+  hourInput.size(70, 42);
 
   hourPlusBtn = createButton("+");
   styleStepperButton(hourPlusBtn);
-  hourPlusBtn.position(px + 140, rowY);
+  hourPlusBtn.position(hourX + 62, rowY);
+  hourPlusBtn.size(38, 42);
   hourPlusBtn.mousePressed(function() {
     adjustTimerValue("hour", 1);
   });
 
+  // 분
   minMinusBtn = createButton("-");
   styleStepperButton(minMinusBtn);
-  minMinusBtn.position(px + 38, rowY + 58);
+  minMinusBtn.position(minX - 58, rowY);
+  minMinusBtn.size(38, 42);
   minMinusBtn.mousePressed(function() {
     adjustTimerValue("min", -5);
   });
 
   minInput = createInput(str(timerMin));
   styleTimerInput(minInput);
-  minInput.position(px + 78, rowY + 58);
-  minInput.size(54, 36);
+  minInput.position(minX - 15, rowY);
+  minInput.size(70, 42);
 
   minPlusBtn = createButton("+");
   styleStepperButton(minPlusBtn);
-  minPlusBtn.position(px + 140, rowY + 58);
+  minPlusBtn.position(minX + 62, rowY);
+  minPlusBtn.size(38, 42);
   minPlusBtn.mousePressed(function() {
     adjustTimerValue("min", 5);
   });
 
+  // 초
   secMinusBtn = createButton("-");
   styleStepperButton(secMinusBtn);
-  secMinusBtn.position(px + 200, rowY + 58);
+  secMinusBtn.position(secX - 58, rowY);
+  secMinusBtn.size(38, 42);
   secMinusBtn.mousePressed(function() {
     adjustTimerValue("sec", -10);
   });
 
   secInput = createInput(str(timerSec));
   styleTimerInput(secInput);
-  secInput.position(px + 240, rowY + 58);
-  secInput.size(54, 36);
+  secInput.position(secX - 15, rowY);
+  secInput.size(70, 42);
 
   secPlusBtn = createButton("+");
   styleStepperButton(secPlusBtn);
-  secPlusBtn.position(px + 302, rowY + 58);
+  secPlusBtn.position(secX + 62, rowY);
+  secPlusBtn.size(38, 42);
   secPlusBtn.mousePressed(function() {
     adjustTimerValue("sec", 10);
   });
 
-  createQuickTimerButton("5분", 5 * 60, px + 32, py + 220);
-  createQuickTimerButton("15분", 15 * 60, px + 102, py + 220);
-  createQuickTimerButton("25분", 25 * 60, px + 172, py + 220);
-  createQuickTimerButton("50분", 50 * 60, px + 242, py + 220);
+  // 빠른 설정 버튼
+  let quickY = py + 245;
 
-  timerConfirmBtn = createButton("✔ 설정하기");
+  createQuickTimerButton("5분", 5 * 60, px + 55, quickY);
+  createQuickTimerButton("15분", 15 * 60, px + 160, quickY);
+  createQuickTimerButton("25분", 25 * 60, px + 265, quickY);
+  createQuickTimerButton("50분", 50 * 60, px + 370, quickY);
+
+  // 설정 버튼
+  timerConfirmBtn = createButton("✓ 설정하기");
   styleButton(timerConfirmBtn, "#5cb85c");
-  timerConfirmBtn.position(px + 96, py + 262);
-  timerConfirmBtn.size(168, 42);
+  timerConfirmBtn.position(px + 150, py + 335);
+  timerConfirmBtn.size(220, 54);
   timerConfirmBtn.mousePressed(confirmTimerSetting);
 
   panelElements = [
@@ -882,17 +987,20 @@ function closeTimerPanel() {
 
 function closeTimerPanelDOM() {
   for (let el of panelElements) {
-    if (el) el.remove();
+    if (el) {
+      el.remove();
+    }
   }
+
   panelElements = [];
   quickButtons = [];
 }
 
 function drawTimerPanel() {
-  let px = width / 2 - 180;
-  let py = height / 2 - 145;
-  let pw = 360;
-  let ph = 330;
+  let pw = 520;
+  let ph = 420;
+  let px = width / 2 - pw / 2;
+  let py = height / 2 - ph / 2;
 
   noStroke();
   fill(0, 0, 0, 120);
@@ -900,43 +1008,46 @@ function drawTimerPanel() {
 
   noStroke();
   fill(30, 15, 60, 245);
-  rect(px, py, pw, ph, 18);
+  rect(px, py, pw, ph, 22);
 
   stroke(160, 130, 220);
   strokeWeight(1.5);
   noFill();
-  rect(px, py, pw, ph, 18);
+  rect(px, py, pw, ph, 22);
 
   noStroke();
   fill(255);
   textAlign(CENTER, CENTER);
-  textSize(18);
-  text("타이머 설정", px + pw / 2, py - 24);
+  textSize(22);
+  text("타이머 설정", px + pw / 2, py - 28);
 
   fill(190, 175, 230);
-  textSize(12);
-  text("완료할 시간을 정하면 체크리스트와 연결됩니다.", px + pw / 2, py + 78);
+  textSize(14);
+  text("완료할 시간을 정하면 체크리스트와 연결됩니다.", px + pw / 2, py + 105);
 
+  // 시 / 분 / 초 라벨
   fill(220, 200, 255);
-  textSize(13);
-  text("시", px + 105, py + 94);
-  text("분", px + 105, py + 152);
-  text("초", px + 267, py + 152);
+  textSize(15);
 
+  text("시", px + 135, py + 135);
+  text("분", px + 300, py + 135);
+  text("초", px + 465, py + 135);
+
+  // 하단 설명
   fill(180, 160, 220);
-  textSize(11);
+  textSize(12);
 
   if (timerMode === "duration") {
-    text("예: 25분 동안 집중하기", px + pw / 2, py + ph - 50);
+    text("예: 25분 동안 집중하기", px + pw / 2, py + ph - 78);
   } else {
-    text("입력한 오늘의 시각까지 자동 카운트다운됩니다.", px + pw / 2, py + ph - 50);
+    text("입력한 오늘의 시각까지 자동 카운트다운됩니다.", px + pw / 2, py + ph - 78);
   }
 }
-
 function confirmTimerSetting() {
   readTimerInputs();
 
   let totalSec = timerHour * 3600 + timerMin * 60 + timerSec;
+
   if (totalSec <= 0) return;
 
   if (timerMode === "duration") {
@@ -951,6 +1062,7 @@ function confirmTimerSetting() {
 
 function setTimerDuration(index, totalSec) {
   let t = todoList[index].timer;
+
   t.mode = "duration";
   t.totalSec = totalSec;
   t.remainSec = totalSec;
@@ -965,11 +1077,15 @@ function setTimerDeadline(index, h, m, s) {
   let target = new Date();
 
   target.setHours(h, m, s, 0);
-  if (target <= now) target.setDate(target.getDate() + 1);
+
+  if (target <= now) {
+    target.setDate(target.getDate() + 1);
+  }
 
   let diffSec = Math.floor((target - now) / 1000);
 
   let t = todoList[index].timer;
+
   t.mode = "deadline";
   t.totalSec = diffSec;
   t.remainSec = diffSec;
@@ -988,7 +1104,6 @@ function startTimer(index) {
   if (t.running || t.finished) return;
 
   t.running = true;
-  t.remainSec = t.totalSec;
   t.startedAt = millis();
 
   characterAnimating = true;
@@ -1005,13 +1120,12 @@ function updateTimers() {
 
     if (!t) continue;
 
+    // 이미 초과된 타이머가 있고 아직 완료 체크가 안 됐으면 캐릭터 멈춤 유지
     if (t.expired && !todo.done) {
       expiredExists = true;
     }
 
     if (!t.running) continue;
-
-    runningExists = true;
 
     if (todo.done) {
       t.running = false;
@@ -1019,6 +1133,8 @@ function updateTimers() {
       t.expired = false;
       continue;
     }
+
+    runningExists = true;
 
     let elapsed = (millis() - t.startedAt) / 1000;
     t.remainSec = max(0, t.totalSec - elapsed);
@@ -1029,9 +1145,12 @@ function updateTimers() {
     }
   }
 
+  // 하나라도 시간 초과된 할 일이 있으면 캐릭터 멈춤
   if (expiredExists) {
     characterAnimating = false;
-  } else if (runningExists) {
+  } 
+  // 초과된 건 없고 실행 중인 타이머만 있으면 캐릭터 움직임
+  else if (runningExists) {
     characterAnimating = true;
   }
 }
@@ -1203,15 +1322,13 @@ function updateTabStyle() {
 function createPathNodes() {
   pathNodes = [];
 
-  let startX = width * 0.18;
-  let endX = width * 0.86;
-
-  // 그래프를 아래쪽으로 이동
-  let baseY = height * 0.90;
+  let startX = width * 0.16;
+  let endX = width * 0.84;
+  let baseY = height * 0.83;
 
   for (let i = 0; i < todoList.length; i++) {
     let x = map(i, 0, max(todoList.length - 1, 1), startX, endX);
-    let yOffset = sin(i * 1.1) * 20;
+    let yOffset = sin(i * 1.1) * 28;
     let y = baseY + yOffset;
 
     pathNodes.push({ x: x, y: y });
@@ -1267,7 +1384,7 @@ function drawMovingCharacterOnPath() {
   translate(pos.x, pos.y);
   rotate(angle);
 
-  // 하단 이동 캐릭터 4배 확대
+  // 하단 이동 캐릭터: 기존 90에서 360으로 4배 확대
   image(getCurrentCharacterImage(stageIndex), 0, 0, 360, 360);
 
   pop();
@@ -1288,7 +1405,9 @@ function getCharacterPathPosition() {
 
   return {
     x: pathNodes[idx].x,
-    y: pathNodes[idx].y - 145
+
+    // 캐릭터가 커졌기 때문에 위로 올림
+    y: pathNodes[idx].y - 80
   };
 }
 
@@ -1408,6 +1527,8 @@ function goToMusicPage() {
 }
 
 function goBackToResultPage() {
+  stopAllSongs();
+
   currentPage = "result";
   showOnlyResultUI();
 }
@@ -1494,14 +1615,51 @@ function handleMusicClick() {
       mouseY < y + 22;
 
     if (inside) {
-      if (inventoryCount >= song.need) {
-        currentSongIndex = i;
+      // 잠긴 곡이면 클릭해도 재생 안 됨
+      if (inventoryCount < song.need) {
+        console.log("아직 잠긴 곡입니다.");
+        return;
       }
+
+      playSong(i);
       return;
     }
   }
 }
 
+function playSong(index) {
+  // 브라우저 오디오 활성화
+  if (typeof userStartAudio === "function") {
+    userStartAudio();
+  }
+
+  // 현재 재생 중인 모든 곡 멈추기
+  for (let i = 0; i < songSounds.length; i++) {
+    if (songSounds[i] && songSounds[i].isPlaying()) {
+      songSounds[i].stop();
+    }
+  }
+
+  // 음악 파일이 없어도 선택 상태는 바뀌게 함
+  currentSongIndex = index;
+
+  // 음악 파일이 있으면 재생
+  if (songSounds[index]) {
+    songSounds[index].play();
+  } else {
+    console.log("음악 파일이 아직 없습니다. 표시만 변경합니다.");
+  }
+}
+
+function stopAllSongs() {
+  for (let i = 0; i < songSounds.length; i++) {
+    if (songSounds[i] && songSounds[i].isPlaying()) {
+      songSounds[i].stop();
+    }
+  }
+
+  currentSongIndex = -1;
+}
 
 // ============================================================
 // 클릭 처리
@@ -1510,10 +1668,10 @@ function handleMusicClick() {
 function mousePressed() {
   if (currentPage === "main") {
     if (timerPanelOpen) {
-      let px = width / 2 - 180;
-      let py = height / 2 - 145;
+      let px = width / 2 - 520 / 2;
+      let py = height / 2 - 420 / 2;
 
-      if (mouseX < px || mouseX > px + 360 || mouseY < py || mouseY > py + 330) {
+      if (mouseX < px || mouseX > px + 520 || mouseY < py || mouseY > py + 420) {
         closeTimerPanel();
         return;
       }
@@ -1529,8 +1687,8 @@ function mousePressed() {
 
 function handleCharacterClick() {
   let charX = width * 0.22;
-  let charY = height * 0.27;
-  let charSize = min(width, height) * 0.58;
+  let charY = height * 0.42;
+  let charSize = min(width, height) * 0.68;
 
   let d = dist(mouseX, mouseY, charX, charY);
 
@@ -1575,6 +1733,7 @@ function handleChecklistClick() {
       }
 
       saveProgress();
+
       return;
     }
   }
@@ -1617,9 +1776,13 @@ function handleTimerClicks() {
 
 function countDone() {
   let count = 0;
+
   for (let todo of todoList) {
-    if (todo.done) count++;
+    if (todo.done) {
+      count++;
+    }
   }
+
   return count;
 }
 
@@ -1628,6 +1791,7 @@ function getStageIndex(doneCount, totalCount) {
 
   let stageIndex = floor((doneCount * 4) / totalCount);
   stageIndex = constrain(stageIndex, 0, 4);
+
   return stageIndex;
 }
 
@@ -1678,9 +1842,12 @@ function loadProgress() {
 
   normalizeTodoTimers();
 
+  // 저장 기록은 바로 메인 화면으로 넘기지 않고,
+  // 입력 화면에서 목록을 다시 확인한 뒤 시작할 수 있게 함
   currentPage = "input";
   loadedFromSave = true;
   messageText = "저장된 기록을 불러왔습니다.";
+
   showOnlyInputUI();
 }
 
@@ -1698,6 +1865,7 @@ function normalizeTodoTimers() {
       };
     }
 
+    // 저장 후 다시 불러올 때 millis() 기준이 달라지므로 실행 중인 타이머는 멈춘 상태로 복원
     if (todo.timer.running) {
       todo.timer.running = false;
     }
@@ -1718,8 +1886,9 @@ function loadInventory() {
   }
 }
 
-// 새 할 일 시작: 오늘 할 일 기록만 삭제, 보유 캐릭터는 유지
+// 새 할 일 시작: 오늘 할 일 기록만 삭제, 보유 캐릭터 개수는 유지
 function restartProgram() {
+  stopAllSongs();
   todoList = [];
   messageText = "";
   rewardClaimed = false;
@@ -1739,8 +1908,9 @@ function restartProgram() {
   showOnlyInputUI();
 }
 
-// 전체 초기화: 오늘 할 일 + 보유 캐릭터 전부 삭제
+// 전체 초기화: 오늘 할 일 + 보유 캐릭터 개수까지 전부 삭제
 function resetAllData() {
+  stopAllSongs();
   todoList = [];
   inventoryCount = 0;
   messageText = "전체 기록이 초기화되었습니다.";
