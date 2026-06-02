@@ -1,0 +1,89 @@
+function buildLoginUI() {
+  loginInput = createInput("");
+  loginInput.attribute("placeholder", "아이디 입력");
+  loginInput.style("font-size", "18px");
+  loginInput.style("padding", "12px 18px");
+  loginInput.style("border", "1px solid #43e0c0");
+  loginInput.style("border-radius", "4px");
+  loginInput.style("background", "rgba(0, 0, 0, 0.75)");
+  loginInput.style("color", "#43e0c0");
+  loginInput.style("outline", "none");
+  loginInput.style("font-family", "'Share Tech Mono', monospace");
+
+  loginInput.elt.addEventListener("keydown", function(e) {
+    if (e.key === "Enter") {
+      loginUser();
+    }
+  });
+
+  loginButton = createButton("LOGIN");
+  loginButton.style("font-size", "18px");
+  loginButton.style("padding", "12px 28px");
+  loginButton.style("border", "1px solid #43e0c0");
+  loginButton.style("border-radius", "4px");
+  loginButton.style("background", "rgba(0, 0, 0, 0.75)");
+  loginButton.style("color", "#43e0c0");
+  loginButton.style("font-family", "'Share Tech Mono', monospace");
+  loginButton.style("cursor", "pointer");
+  loginButton.mousePressed(loginUser);
+}
+
+function showOnlyLoginUI() {
+  hideAllUI();
+  loginInput.show();
+  loginButton.show();
+}
+
+function drawLoginPage() {
+  background(0);
+
+  drawIntroStars();
+  drawCRTOverlay();
+
+  fill(67, 224, 192);
+  textFont("Share Tech Mono");
+  textAlign(CENTER, CENTER);
+
+  drawingContext.shadowBlur = 18;
+  drawingContext.shadowColor = "#43e0c0";
+
+  textSize(30);
+  text("USER IDENTIFICATION SYSTEM", width / 2, height * 0.28);
+
+  textSize(24);
+  text("당신의 아이디를 입력하세요", width / 2, height * 0.38);
+
+  textSize(16);
+  text("Enter your ID to access 2DO orbital task system", width / 2, height * 0.45);
+
+  if (loginMessage !== "") {
+    fill(255, 130, 160);
+    textSize(16);
+    text(loginMessage, width / 2, height * 0.68);
+  }
+
+  drawingContext.shadowBlur = 0;
+
+  loginInput.position(width / 2 - 180, height * 0.53);
+  loginInput.size(260, 46);
+
+  loginButton.position(width / 2 + 95, height * 0.53);
+  loginButton.size(100, 46);
+
+  textFont("sans-serif");
+}
+
+function loginUser() {
+  let value = loginInput.value().trim();
+
+  if (value === "") {
+    loginMessage = "아이디를 입력해주세요.";
+    return;
+  }
+
+  userId = value;
+  localStorage.setItem("twoDoUserId", userId);
+
+  currentPage = "input";
+  showOnlyInputUI();
+}
