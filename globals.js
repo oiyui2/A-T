@@ -93,6 +93,15 @@ let navHomeBtn, navTodoBtn, navMusicBtn;
 let musicEnabled = true;
 let musicToggleBtn;
 
+let currentPage = "intro";
+
+let introStartTime = 0;
+let introDuration = 10000;
+
+let loginInput;
+let loginButton;
+let userId = "";
+let loginMessage = "";
 
 
 // ============================================================
