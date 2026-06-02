@@ -1,9 +1,8 @@
 // ============================================================
 // 전역 변수 및 상태 관리
 // ============================================================
-let currentPage = "input"; // "input", "main", "result", "music"
+let currentPage = "input"; 
 
-// 캐릭터 및 애니메이션 관련
 let characters = [];
 let selectedCharacterIndex = 0;
 let loadedFromSave = false;
@@ -12,33 +11,27 @@ let clickEffect = 1;
 let characterAnimating = true;
 let finalBurst = 0;
 
-// 배경 및 환경 효과
 let stars = [];
 let songSounds = [];
 
-// 할 일 데이터
 let todoList = [];
 let messageText = "";
 let pathNodes = [];
 let rewardClaimed = false;
 let inventoryCount = 0;
 
-// 타이머 패널 상태 및 입력값
 let timerPanelOpen = false;
 let timerPanelIndex = -1;
-let timerMode = "duration"; // "duration", "deadline"
+let timerMode = "duration"; 
 let timerHour = 0;
 let timerMin = 0;
 let timerSec = 0;
 
-// 타이머 패널 페널티 연출
 let penaltyList = [];
 
-// 오디오 토글 상태
 let musicEnabled = true;
 let currentSongIndex = -1;
 
-// 곡 목록 및 제작자 정보
 let songs = [
   { title: "별빛 산책", need: 1 },
   { title: "달 조각 왈츠", need: 2 },
@@ -53,7 +46,6 @@ let creatorSchool = "";
 // ============================================================
 // 핵심 계산 및 데이터 로직 함수
 // ============================================================
-
 function countDone() {
   let count = 0;
   for (let todo of todoList) {
@@ -69,7 +61,10 @@ function getStageIndex(doneCount, totalCount) {
 }
 
 function getCurrentCharacterImage(stageIndex) {
-  return characters[selectedCharacterIndex][stageIndex];
+  if (characters[selectedCharacterIndex] && characters[selectedCharacterIndex][stageIndex]) {
+    return characters[selectedCharacterIndex][stageIndex];
+  }
+  return null;
 }
 
 function formatTime(sec) {
@@ -174,9 +169,152 @@ function createStar() {
 }
 
 // ============================================================
-// Storage (저장/불러오기/초기화) 로직
+// [추가] 인터랙션 및 상태 변경 비즈니스 로직 함수들
 // ============================================================
+function addTodo() {
+  if (!inputBox) return;
+  let val = inputBox.value().trim();
+  if (val === "") {
+    messageText = "할 일을 입력해 주세요.";
+    return;
+  }
+  if (todoList.length >= 8) {
+    messageText = "할 일은 최대 8개까지 생성할 수 있습니다.";
+    return;
+  }
+  todoList.push({
+    title: val,
+    done: false,
+    timer: { mode: null, totalSec: 0, remainSec: 0, running: false, finished: false, expired: false, startedAt: 0 }
+  });
+  inputBox.value("");
+  messageText = "'" + val + "'이(가) 추가되었습니다.";
+  saveProgress();
+}
 
+function goToMainPage() {
+  if (todoList.length < 4) {
+    messageText = "최소 4개 이상의 할 일을 입력해야 시작할 수 있습니다.";
+    return;
+  }
+  currentPage = "main";
+  messageText = "";
+  createPathNodes();
+  showOnlyMainUI();
+}
+
+function goToResultPage() {
+  currentPage = "result";
+  let doneCount = countDone();
+  if (doneCount === todoList.length && todoList.length > 0 && !rewardClaimed) {
+    inventoryCount++;
+    rewardClaimed = true;
+    saveInventory();
+  }
+  saveProgress();
+  showOnlyResultUI();
+}
+
+function restartProgram() {
+  todoList = [];
+  rewardClaimed = false;
+  currentPage = "input";
+  messageText = "새로운 하루를 시작합니다!";
+  saveProgress();
+  showOnlyInputUI();
+}
+
+function resetAllData() {
+  if (confirm("모든 투두리스트와 보유 캐릭터 데이터가 삭제됩니다. 초기화하시겠습니까?")) {
+    localStorage.clear();
+    todoList = [];
+    inventoryCount = 0;
+    rewardClaimed = false;
+    currentPage = "input";
+    messageText = "전체 데이터가 초기화되었습니다.";
+    showOnlyInputUI();
+  }
+}
+
+function navToHome() { stopAllSongs(); currentPage = "input"; showOnlyInputUI(); }
+function navToTodo() { stopAllSongs(); if(todoList.length >= 4) { currentPage = "main"; createPathNodes(); showOnlyMainUI(); } else { messageText = "할 일을 4개 이상 입력해 주세요."; showOnlyInputUI(); } }
+function navToMusic() { if (countDone() === todoList.length && todoList.length > 0) { currentPage = "music"; showOnlyMusicUI(); } else { alert("오늘의 할 일을 모두 끝내고 결과 화면을 거쳐야 음악실에 입장할 수 있습니다!"); } }
+
+function adjustTimerValue(type, amt) {
+  if (type === "hour") timerHour = max(0, timerHour + amt);
+  if (type === "min") timerMin = max(0, timerMin + amt);
+  if (type === "sec") timerSec = max(0, timerSec + amt);
+  syncTimerInputs();
+}
+
+function confirmTimerSetting() {
+  if (timerPanelIndex === -1) return;
+  
+  // DOM 입력값 동기화
+  if (hourInput) timerHour = int(hourInput.value()) || 0;
+  if (minInput) timerMin = int(minInput.value()) || 0;
+  if (secInput) timerSec = int(secInput.value()) || 0;
+
+  let total = timerHour * 3600 + timerMin * 60 + timerSec;
+  if (total <= 0) {
+    alert("시간을 0초 이상으로 설정해 주세요.");
+    return;
+  }
+
+  let t = todoList[timerPanelIndex].timer;
+  t.mode = timerMode;
+  t.totalSec = total;
+  t.remainSec = total;
+  t.running = false;
+  t.finished = false;
+  t.expired = false;
+
+  closeTimerPanel();
+  saveProgress();
+}
+
+function startTimer(index) {
+  let t = todoList[index].timer;
+  if (t.mode === null || t.totalSec <= 0) return;
+  t.running = true;
+  t.startedAt = millis();
+  characterAnimating = true;
+}
+
+function playSong(index) {
+  stopAllSongs();
+  currentSongIndex = index;
+  if (musicEnabled && songSounds[index]) {
+    songSounds[index].loop();
+  }
+}
+
+function stopAllSongs() {
+  currentSongIndex = -1;
+  for (let sound of songSounds) {
+    if (sound && sound.isPlaying()) sound.stop();
+  }
+}
+
+function toggleMusicEnabled() {
+  musicEnabled = !musicEnabled;
+  if (musicToggleBtn) {
+    musicToggleBtn.html(musicEnabled ? "🔊 곡 재생: 켜짐" : "🔇 곡 재생: 꺼짐");
+  }
+  if (!musicEnabled) {
+    if (currentSongIndex !== -1 && songSounds[currentSongIndex]) {
+      songSounds[currentSongIndex].pause();
+    }
+  } else {
+    if (currentSongIndex !== -1 && songSounds[currentSongIndex] && !songSounds[currentSongIndex].isPlaying()) {
+      songSounds[currentSongIndex].loop();
+    }
+  }
+}
+
+// ============================================================
+// Storage (저장/불러오기) 로직
+// ============================================================
 function saveProgress() {
   let saveData = {
     todoList: todoList,
@@ -199,22 +337,4 @@ function loadProgress() {
 
   for (let todo of todoList) {
     if (!todo.timer) {
-      todo.timer = { mode: null, totalSec: 0, remainSec: 0, running: false, finished: false, expired: false, startedAt: 0 };
-    }
-    if (todo.timer.running) todo.timer.running = false;
-  }
-
-  currentPage = "input";
-  loadedFromSave = true;
-  messageText = "저장된 기록을 불러왔습니다.";
-  showOnlyInputUI();
-}
-
-function saveInventory() {
-  localStorage.setItem("twoDoInventoryCount", inventoryCount);
-}
-
-function loadInventory() {
-  let savedCount = localStorage.getItem("twoDoInventoryCount");
-  inventoryCount = (savedCount === null) ? 0 : int(savedCount);
-}
+      todo.timer = { mode: null, totalSec: 0, remainSec:
