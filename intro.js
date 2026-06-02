@@ -58,9 +58,11 @@ function drawIntroPage() {
   text("System will move to login page soon...", width / 2, height * 0.88);
 
   if (millis() - introStartTime > introDuration) {
-    currentPage = "login";
-    showOnlyLoginUI();
-  }
+  currentPage = "radar";
+  radarStartTime = millis();
+  radarCurrentChar = 0;
+  hideAllUI();
+}
 
   textFont("sans-serif");
 }
