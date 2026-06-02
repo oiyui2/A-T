@@ -17,8 +17,10 @@ buildMainPageUI();
 buildResultPageUI();
 buildMusicPageUI();
 buildNavBar();
+buildLoginUI();
 
-showOnlyInputUI();
+introStartTime = millis();
+showOnlyIntroUI();
 
 }
 
@@ -247,3 +249,5 @@ timerPanelOpen = false;
 openTimerPanel(currentIndex);
   }
 }
+
+
