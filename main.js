@@ -30,19 +30,22 @@ showOnlyIntroUI();
 // ============================================================
 
 function draw() {
-if (currentPage === "input") {
-drawInputPage();
-} else if (currentPage === "main") {
-drawMainPage();
-} else if (currentPage === "result") {
-drawResultPage();
-} else if (currentPage === "music") {
-drawMusicPage();
-}
+  if (currentPage === "intro") {
+    drawIntroPage();
+  } else if (currentPage === "login") {
+    drawLoginPage();
+  } else if (currentPage === "input") {
+    drawInputPage();
+  } else if (currentPage === "main") {
+    drawMainPage();
+  } else if (currentPage === "result") {
+    drawResultPage();
+  } else if (currentPage === "music") {
+    drawMusicPage();
+  }
 
-positionUI();
+  positionUI();
 }
-
 
 // ============================================================
 // UI 생성
