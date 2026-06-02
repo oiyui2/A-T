@@ -1,13 +1,24 @@
+// ============================================================
 // 전역 변수
 // ============================================================
 
+let currentPage = "intro";
+// "intro" : 오프닝 화면
+// "login" : 아이디 입력 화면
 // "input" : 할 일 입력 화면
 // "main" : 캐릭터 성장 + 할 일 체크 화면
 // "result" : 오늘 결과 저장 화면
 // "music" : 곡 플레이 화면
 
+let introStartTime = 0;
+let introDuration = 10000;
+
+let loginInput;
+let loginButton;
+let userId = "";
+let loginMessage = "";
+
 // 캐릭터 이미지
-// characters[캐릭터번호][성장단계]
 let characters = [];
 let selectedCharacterIndex = 0;
 let loadedFromSave = false;
@@ -70,12 +81,12 @@ let penaltyList = [];
 
 // 곡 목록
 let songs = [
-{ title: "별빛 산책", need: 1 },
-{ title: "달 조각 왈츠", need: 2 },
-{ title: "구름 위의 리듬", need: 3 },
-{ title: "밤바다 드럼", need: 4 },
-{ title: "마지막 행성의 노래", need: 5 },
-{ title: "숨겨진 멜로디", need: 7 }
+  { title: "별빛 산책", need: 1 },
+  { title: "달 조각 왈츠", need: 2 },
+  { title: "구름 위의 리듬", need: 3 },
+  { title: "밤바다 드럼", need: 4 },
+  { title: "마지막 행성의 노래", need: 5 },
+  { title: "숨겨진 멜로디", need: 7 }
 ];
 
 let currentSongIndex = -1;
@@ -84,25 +95,9 @@ let currentSongIndex = -1;
 let creatorNames = "박서정, 오유현";
 let creatorSchool = "";
 
-
 // 상단 내비게이션 버튼
 let navHomeBtn, navTodoBtn, navMusicBtn;
 
-// 곡 재생 여부(소리 on/off) 토글
+// 곡 재생 여부 토글
 let musicEnabled = true;
 let musicToggleBtn;
-
-let currentPage = "intro";
-
-let introStartTime = 0;
-let introDuration = 10000;
-
-let loginInput;
-let loginButton;
-let userId = "";
-let loginMessage = "";
-
-
-// ============================================================
-// preload
-// ============================================================
