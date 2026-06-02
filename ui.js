@@ -210,6 +210,10 @@ if (resetAllButton) resetAllButton.hide();
 if (loginInput) loginInput.hide();
 if (loginButton) loginButton.hide();
 
+if (navHomeBtn) navHomeBtn.hide();
+if (navTodoBtn) navTodoBtn.hide();
+if (navMusicBtn) navMusicBtn.hide();
+
 if (resultButton) resultButton.hide();
 
 if (saveImageButton) saveImageButton.hide();
