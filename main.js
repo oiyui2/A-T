@@ -32,6 +32,8 @@ showOnlyIntroUI();
 function draw() {
   if (currentPage === "intro") {
     drawIntroPage();
+  } else if (currentPage === "radar") {
+    drawRadarPage();
   } else if (currentPage === "login") {
     drawLoginPage();
   } else if (currentPage === "input") {
