@@ -1,13 +1,14 @@
 // ============================================================
 // p5.js 기본 생명주기 함수들
 // ============================================================
-
 function preload() {
   characters[0] = [loadImage("images/1단계불.png"), loadImage("images/2단계불.png"), loadImage("images/3단계불.png"), loadImage("images/4단계불.png"), loadImage("images/5단계불.png")];
   characters[1] = [loadImage("images/1단계구름.png"), loadImage("images/2단계구름.png"), loadImage("images/3단계구름.png"), loadImage("images/4단계구름.png"), loadImage("images/5단계구름.png")];
   characters[2] = [loadImage("images/1단계유령.png"), loadImage("images/2단계유령.png"), loadImage("images/3단계유령.png"), loadImage("images/4단계유령.png"), loadImage("images/5단계유령.png")];
   characters[3] = [loadImage("images/1단계구.png"), loadImage("images/2단계구.png"), loadImage("images/3단계구.png"), loadImage("images/4단계구.png"), loadImage("images/5단계구.png")];
-  songSounds[0] = loadSound("sounds/song1.mp3");
+  
+  // 사운드 파일 유무에 따라 실무 구동 시 에러 방지 처리 권장
+  songSounds[0] = loadSound("sounds/song1.mp3", () => {}, (err) => console.log("Sound load bypass"));
 }
 
 function setup() {
@@ -39,7 +40,6 @@ function draw() {
 // ============================================================
 // 화면별 드로잉 함수 
 // ============================================================
-
 function drawInputPage() {
   drawGradientBG(color(20, 10, 50), color(60, 20, 80));
   fill(255); textStyle(BOLD); textSize(min(width, height) * 0.060); text("2DO", width / 2, height * 0.10);
@@ -92,8 +92,12 @@ function drawMainCharacter() {
     squash = 1 + cos(frameCount * angleSpeed * 2) * 0.03; stretch = 1 / squash;
   }
   noStroke(); fill(200, 210, 220, 90); ellipse(charX, charY + charSize * 0.2, charSize * 0.58, charSize * 0.08);
-  push(); translate(charX, charY); rotate(angle); scale(stretch * clickEffect, squash / clickEffect);
-  image(getCurrentCharacterImage(stageIndex), 0, 0, charSize, charSize); pop();
+  
+  let img = getCurrentCharacterImage(stageIndex);
+  if (img) {
+    push(); translate(charX, charY); rotate(angle); scale(stretch * clickEffect, squash / clickEffect);
+    image(img, 0, 0, charSize, charSize); pop();
+  }
 
   fill(220, 210, 255); noStroke(); textSize(22); text("현재 " + (stageIndex + 1) + "단계", charX, charY + charSize * 0.38);
   if (!characterAnimating) { fill(255, 180, 200); textSize(16); text("타이머 종료로 캐릭터가 멈췄습니다.", charX, charY + charSize * 0.46); }
@@ -176,7 +180,12 @@ function drawGrowthPath() {
 function drawMovingCharacterOnPath() {
   let doneCount = countDone(), stageIndex = getStageIndex(doneCount, todoList.length), pos = getCharacterPathPosition();
   let angle = characterAnimating ? sin(frameCount * 0.05) * radians(5) : 0;
-  push(); translate(pos.x, pos.y); rotate(angle); image(getCurrentCharacterImage(stageIndex), 0, 0, 360, 360); pop();
+  
+  let img = getCurrentCharacterImage(stageIndex);
+  if (img) {
+    push(); translate(pos.x, pos.y); rotate(angle); image(img, 0, 0, 360, 360); pop();
+  }
+  
   if (doneCount === todoList.length && todoList.length > 0) {
     finalBurst = min(finalBurst + 1, 55); noStroke();
     for (let i = 9; i > 0; i--) { fill(180, 220, 255, map(i, 9, 0, 0, 120)); ellipse(pos.x, pos.y, i * finalBurst * 0.45, i * finalBurst * 0.45); }
@@ -192,7 +201,12 @@ function drawResultPage() {
   textStyle(NORMAL); fill(220, 210, 255); textSize(min(width, height) * 0.032); text("완료한 할 일: " + doneCount + " / " + totalCount, width / 2, height * 0.25); text("완료율: " + percent + "%", width / 2, height * 0.31);
   if (percent === 100) { fill(180, 255, 200); text("오늘의 캐릭터를 획득했습니다!", width / 2, height * 0.38); }
   else { fill(255, 180, 200); text("완료율 100%가 되면 캐릭터를 획득할 수 있습니다.", width / 2, height * 0.38); }
-  image(getCurrentCharacterImage(getStageIndex(doneCount, totalCount)), width / 2, height * 0.56, min(width, height) * 0.28, min(width, height) * 0.28);
+  
+  let img = getCurrentCharacterImage(getStageIndex(doneCount, totalCount));
+  if (img) {
+    image(img, width / 2, height * 0.56, min(width, height) * 0.28, min(width, height) * 0.28);
+  }
+  
   fill(255); textSize(min(width, height) * 0.027); text("보유한 캐릭터 개수: " + inventoryCount + "개", width / 2, height * 0.76);
   fill(220, 210, 255); textSize(16); text("이 화면은 이미지로 저장할 수 있습니다.", width / 2, height * 0.82); text("제작자: " + creatorNames, width / 2, height * 0.86);
   if (creatorSchool !== "") text("소속: " + creatorSchool, width / 2, height * 0.89);
@@ -226,7 +240,6 @@ function drawGradientBG(c1, c2) {
 // ============================================================
 // 마우스 인터랙션 이벤트 핸들러
 // ============================================================
-
 function mousePressed() {
   if (currentPage === "main") {
     if (timerPanelOpen) {
