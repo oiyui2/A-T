@@ -847,3 +847,17 @@ text("소속: " + creatorSchool, width / 2, height * 0.89);
 }
 
 function downloadResultImage() {
+  saveCanvas("2DO_오늘의_완료기록", "png");
+}
+
+function goToMusicPage() {
+  currentPage = "music";
+  showOnlyMusicUI();
+}
+
+function goBackToResultPage() {
+  stopAllSongs();
+
+  currentPage = "result";
+  showOnlyResultUI();
+}
