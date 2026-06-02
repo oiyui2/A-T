@@ -229,42 +229,60 @@ timerPanelIndex = -1;
 }
 
 function showOnlyInputUI() {
-hideAllUI();
+  hideAllUI();
 
-inputBox.show();
-addButton.show();
-completeButton.show();
-fullscreenButton.show();
-loadButton.show();
-resetAllButton.show();
+  navHomeBtn.show();
+  navTodoBtn.show();
+  navMusicBtn.show();
+
+  inputBox.show();
+  addButton.show();
+  completeButton.show();
+  fullscreenButton.show();
+  loadButton.show();
+  resetAllButton.show();
 }
 
 function showOnlyMainUI() {
-hideAllUI();
+  hideAllUI();
 
-resultButton.show();
+  navHomeBtn.show();
+  navTodoBtn.show();
+  navMusicBtn.show();
+
+  resultButton.show();
 }
 
 function showOnlyResultUI() {
-hideAllUI();
+  hideAllUI();
 
-saveImageButton.show();
-musicPageButton.show();
-restartButton.show();
-resetAllButton.show();
+  navHomeBtn.show();
+  navTodoBtn.show();
+  navMusicBtn.show();
+
+  saveImageButton.show();
+  musicPageButton.show();
+  restartButton.show();
+  resetAllButton.show();
 }
 
 function showOnlyMusicUI() {
-hideAllUI();
+  hideAllUI();
 
-backToMainButton.show();
-stopMusicButton.show();
-musicToggleBtn.show();
+  navHomeBtn.show();
+  navTodoBtn.show();
+  navMusicBtn.show();
+
+  backToMainButton.show();
+  stopMusicButton.show();
+  musicToggleBtn.show();
 }
 
 function positionUI() {
-positionNav();
-updateNavHighlight();
+if (currentPage !== "intro" && currentPage !== "login" && currentPage !== "radar") {
+  positionNav();
+  updateNavHighlight();
+}
 
 if (currentPage === "input") {
 // 왼쪽 입력 영역
