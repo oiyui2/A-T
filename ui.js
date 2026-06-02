@@ -10,7 +10,6 @@ let panelElements = [];
 // ============================================================
 // UI 빌더 및 스타일링
 // ============================================================
-
 function buildInputPageUI() {
   inputBox = createInput("");
   inputBox.attribute("placeholder", "할 일을 입력하세요");
@@ -38,7 +37,7 @@ function buildInputPageUI() {
 
   fullscreenButton = createButton("전체화면");
   styleButton(fullscreenButton, "#5f6fbf");
-  fullscreenButton.mousePressed(() => { fullscreen(true); resizeCanvas(windowWidth, windowHeight); });
+  fullscreenButton.mousePressed(() => { fullscreen(!fullscreen()); resizeCanvas(windowWidth, windowHeight); });
 
   loadButton = createButton("저장 기록 불러오기");
   styleButton(loadButton, "#9a7ac7");
@@ -92,7 +91,6 @@ function buildNavBar() {
 // ============================================================
 // UI 가시성 및 배치 제어
 // ============================================================
-
 function hideAllUI() {
   let elements = [inputBox, addButton, completeButton, fullscreenButton, loadButton, resetAllButton,
                   resultButton, saveImageButton, musicPageButton, restartButton, backToMainButton, stopMusicButton, musicToggleBtn];
@@ -102,50 +100,53 @@ function hideAllUI() {
   timerPanelIndex = -1;
 }
 
-function showOnlyInputUI() { hideAllUI(); [inputBox, addButton, completeButton, fullscreenButton, loadButton, resetAllButton].forEach(el => el.show()); }
-function showOnlyMainUI() { hideAllUI(); resultButton.show(); }
-function showOnlyResultUI() { hideAllUI(); [saveImageButton, musicPageButton, restartButton, resetAllButton].forEach(el => el.show()); }
-function showOnlyMusicUI() { hideAllUI(); [backToMainButton, stopMusicButton, musicToggleBtn].forEach(el => el.show()); }
+function showOnlyInputUI() { hideAllUI(); [inputBox, addButton, completeButton, fullscreenButton, loadButton, resetAllButton].forEach(el => { if(el) el.show(); }); }
+function showOnlyMainUI() { hideAllUI(); if(resultButton) resultButton.show(); }
+function showOnlyResultUI() { hideAllUI(); [saveImageButton, musicPageButton, restartButton, resetAllButton].forEach(el => { if(el) el.show(); }); }
+function showOnlyMusicUI() { hideAllUI(); [backToMainButton, stopMusicButton, musicToggleBtn].forEach(el => { if(el) el.show(); }); }
 
 function positionUI() {
   let bw = 120, gap = 10, by = 20;
   let startX = width / 2 - (bw * 3 + gap * 2) / 2;
-  [navHomeBtn, navTodoBtn, navMusicBtn].forEach((btn, i) => { btn.size(bw, 42); btn.position(startX + (bw + gap) * i, by); });
+  [navHomeBtn, navTodoBtn, navMusicBtn].forEach((btn, i) => { if(btn){ btn.size(bw, 42); btn.position(startX + (bw + gap) * i, by); } });
 
   let active = "rgba(124,92,191,0.95)", idle = "rgba(255,255,255,0.12)";
-  navHomeBtn.style("background", currentPage === "input" ? active : idle);
-  navTodoBtn.style("background", currentPage === "main" ? active : idle);
-  navMusicBtn.style("background", currentPage === "music" ? active : idle);
+  if(navHomeBtn) navHomeBtn.style("background", currentPage === "input" ? active : idle);
+  if(navTodoBtn) navTodoBtn.style("background", currentPage === "main" ? active : idle);
+  if(navMusicBtn) navMusicBtn.style("background", currentPage === "music" ? active : idle);
   
   if (currentPage === "input") {
     let inputW = min(500, width * 0.45), inputH = 42, addW = 105, g = 14;
     let groupX = width * 0.36 - (inputW + g + addW) / 2;
-    inputBox.size(inputW, inputH); addButton.size(addW, inputH);
-    inputBox.position(groupX, height * 0.34); addButton.position(groupX + inputW + g, height * 0.34);
-    completeButton.size(230, 58); completeButton.position(width * 0.36 - 115, height * 0.48);
-    loadButton.size(260, 58); loadButton.position(width * 0.36 - 130, height * 0.59);
-    resetAllButton.size(210, 58); resetAllButton.position(width * 0.36 - 105, height * 0.70);
-    fullscreenButton.position(width - 150, 30);
+    if(inputBox) { inputBox.size(inputW, inputH); inputBox.position(groupX, height * 0.34); }
+    if(addButton) { addButton.size(addW, inputH); addButton.position(groupX + inputW + g, height * 0.34); }
+    if(completeButton) { completeButton.size(230, 58); completeButton.position(width * 0.36 - 115, height * 0.48); }
+    if(loadButton) { loadButton.size(260, 58); loadButton.position(width * 0.36 - 130, height * 0.59); }
+    if(resetAllButton) { resetAllButton.size(210, 58); resetAllButton.position(width * 0.36 - 105, height * 0.70); }
+    if(fullscreenButton) fullscreenButton.position(width - 150, 30);
   } else if (currentPage === "main") {
-    resultButton.position(width - 190, height - 80);
+    if(resultButton) resultButton.position(width - 190, height - 80);
   } else if (currentPage === "result") {
-    saveImageButton.position(width / 2 - 320, height * 0.88); musicPageButton.position(width / 2 - 145, height * 0.88);
-    restartButton.position(width / 2 + 25, height * 0.88); resetAllButton.position(width / 2 + 175, height * 0.88);
+    if(saveImageButton) saveImageButton.position(width / 2 - 320, height * 0.88); 
+    if(musicPageButton) musicPageButton.position(width / 2 - 145, height * 0.88);
+    if(restartButton) restartButton.position(width / 2 + 25, height * 0.88); 
+    if(resetAllButton) resetAllButton.position(width / 2 + 175, height * 0.88);
   } else if (currentPage === "music") {
-    musicToggleBtn.size(180, 56); stopMusicButton.size(150, 56); backToMainButton.size(150, 56);
-    musicToggleBtn.position(width - 520, height - 84); stopMusicButton.position(width - 350, height - 84); backToMainButton.position(width - 180, height - 84);
+    if(musicToggleBtn) { musicToggleBtn.size(180, 56); musicToggleBtn.position(width - 520, height - 84); }
+    if(stopMusicButton) { stopMusicButton.size(150, 56); stopMusicButton.position(width - 350, height - 84); }
+    if(backToMainButton) { backToMainButton.size(150, 56); backToMainButton.position(width - 180, height - 84); }
   }
 }
 
 function getTodoLayout() {
-  let rowGap = max(52, min(70, (height * 0.48) / max(todoList.length - 1, 1)));
+  let denom = max(todoList.length - 1, 1);
+  let rowGap = max(52, min(70, (height * 0.48) / denom));
   return { listX: width * 0.58, listY: height * 0.30, listW: width * 0.23, rowGap: rowGap, boxSize: 24 };
 }
 
 // ============================================================
 // 스타일 헬퍼 및 부속 타이머 UI 생성
 // ============================================================
-
 function styleButton(btn, bgColor) {
   btn.style("font-size", "16px"); btn.style("padding", "12px 20px"); btn.style("border", "none");
   btn.style("border-radius", "12px"); btn.style("background", bgColor); btn.style("color", "white");
