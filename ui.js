@@ -207,6 +207,9 @@ if (fullscreenButton) fullscreenButton.hide();
 if (loadButton) loadButton.hide();
 if (resetAllButton) resetAllButton.hide();
 
+if (loginInput) loginInput.hide();
+if (loginButton) loginButton.hide();
+
 if (resultButton) resultButton.hide();
 
 if (saveImageButton) saveImageButton.hide();
