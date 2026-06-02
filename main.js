@@ -245,4 +245,5 @@ let currentIndex = timerPanelIndex;
 closeTimerPanelDOM();
 timerPanelOpen = false;
 openTimerPanel(currentIndex);
+  }
 }
