@@ -11,7 +11,7 @@ let currentPage = "intro";
 // "music" : 곡 플레이 화면
 
 let introStartTime = 0;
-let introDuration = 10000;
+let introDuration = 5000;
 
 let loginInput;
 let loginButton;
@@ -102,6 +102,29 @@ let navHomeBtn, navTodoBtn, navMusicBtn;
 let musicEnabled = true;
 let musicToggleBtn;
 
+let radarStartTime = 0;
+let radarDuration = 8000;
+
+let radarDots = [
+  { angle: 20, dist: 0.35 },
+  { angle: 75, dist: 0.62 },
+  { angle: 130, dist: 0.48 },
+  { angle: 190, dist: 0.70 },
+  { angle: 245, dist: 0.40 },
+  { angle: 300, dist: 0.58 },
+  { angle: 340, dist: 0.78 }
+];
+
+let radarMessage = "미확인 생명체 탐색중...";
+let radarCurrentChar = 0;
+let radarTypeSpeed = 3;
+
+// 인트로 Initializing 효과
+let introInitDots = 0;
+let introInitMaxDots = 3;
+let introDoneShown = false;
+
+// 레이더 화면
 let radarStartTime = 0;
 let radarDuration = 8000;
 
