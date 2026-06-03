@@ -123,18 +123,3 @@ let radarTypeSpeed = 3;
 let introInitDots = 0;
 let introInitMaxDots = 3;
 let introDoneShown = false;
-
-
-let radarDots = [
-  { angle: 20, dist: 0.35 },
-  { angle: 75, dist: 0.62 },
-  { angle: 130, dist: 0.48 },
-  { angle: 190, dist: 0.70 },
-  { angle: 245, dist: 0.40 },
-  { angle: 300, dist: 0.58 },
-  { angle: 340, dist: 0.78 }
-];
-
-let radarMessage = "미확인 생명체 탐색중...";
-let radarCurrentChar = 0;
-let radarTypeSpeed = 3;
