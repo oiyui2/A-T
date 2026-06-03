@@ -109,7 +109,14 @@ function buildNavBar() {
   currentPage = "dex";
   showOnlyDexUI();
 }
+function showOnlyDexUI() {
+  hideAllUI();
 
+  navHomeBtn.show();
+  navTodoBtn.show();
+  navDexBtn.show();
+  navMusicBtn.show();
+}
 function styleNavButton(btn) {
 btn.style("font-size", "15px");
 btn.style("border", "none");
