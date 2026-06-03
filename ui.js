@@ -88,17 +88,26 @@ stopAllSongs();
 }
 
 function buildNavBar() {
-navHomeBtn = createButton("🏠 홈");
-styleNavButton(navHomeBtn);
-navHomeBtn.mousePressed(navToHome);
+  navHomeBtn = createButton("HOME");
+  styleNavButton(navHomeBtn);
+  navHomeBtn.mousePressed(navToHome);
 
-navTodoBtn = createButton("✅ 투두");
-styleNavButton(navTodoBtn);
-navTodoBtn.mousePressed(navToTodo);
+  navTodoBtn = createButton("TO DO");
+  styleNavButton(navTodoBtn);
+  navTodoBtn.mousePressed(navToTodo);
 
-navMusicBtn = createButton("🎵 곡 재생");
-styleNavButton(navMusicBtn);
-navMusicBtn.mousePressed(navToMusic);
+  navDexBtn = createButton("INVENTORY");
+  styleNavButton(navDexBtn);
+  navDexBtn.mousePressed(navToDex);
+
+  navMusicBtn = createButton("SONG");
+  styleNavButton(navMusicBtn);
+  navMusicBtn.mousePressed(navToMusic);
+}
+  function navToDex() {
+  closeTimerPanel();
+  currentPage = "dex";
+  showOnlyDexUI();
 }
 
 function styleNavButton(btn) {
@@ -144,25 +153,28 @@ showOnlyMusicUI();
 }
 
 function positionNav() {
-let bw = 120, gap = 10, by = 20;
-let totalW = bw * 3 + gap * 2;
-let startX = width / 2 - totalW / 2;
+  let bw = 120, gap = 10, by = 20;
+  let totalW = bw * 4 + gap * 3;
+  let startX = width / 2 - totalW / 2;
 
-navHomeBtn.size(bw, 42);
-navTodoBtn.size(bw, 42);
-navMusicBtn.size(bw, 42);
+  navHomeBtn.size(bw, 42);
+  navTodoBtn.size(bw, 42);
+  navDexBtn.size(bw, 42);
+  navMusicBtn.size(bw, 42);
 
-navHomeBtn.position(startX, by);
-navTodoBtn.position(startX + (bw + gap), by);
-navMusicBtn.position(startX + (bw + gap) * 2, by);
+  navHomeBtn.position(startX, by);
+  navTodoBtn.position(startX + (bw + gap), by);
+  navDexBtn.position(startX + (bw + gap) * 2, by);
+  navMusicBtn.position(startX + (bw + gap) * 3, by);
 }
-
 function updateNavHighlight() {
-let active = "rgba(124,92,191,0.95)";
-let idle = "rgba(255,255,255,0.12)";
-navHomeBtn.style("background", currentPage === "input" ? active : idle);
-navTodoBtn.style("background", currentPage === "main" ? active : idle);
-navMusicBtn.style("background", currentPage === "music" ? active : idle);
+  let active = "rgba(124,92,191,0.95)";
+  let idle = "rgba(255,255,255,0.12)";
+
+  navHomeBtn.style("background", currentPage === "input" ? active : idle);
+  navTodoBtn.style("background", currentPage === "main" ? active : idle);
+  navDexBtn.style("background", currentPage === "dex" ? active : idle);
+  navMusicBtn.style("background", currentPage === "music" ? active : idle);
 }
 
 
@@ -206,6 +218,7 @@ if (completeButton) completeButton.hide();
 if (fullscreenButton) fullscreenButton.hide();
 if (loadButton) loadButton.hide();
 if (resetAllButton) resetAllButton.hide();
+if (navDexBtn) navDexBtn.hide();
 
 if (loginInput) loginInput.hide();
 if (loginButton) loginButton.hide();
@@ -234,6 +247,7 @@ function showOnlyInputUI() {
   navHomeBtn.show();
   navTodoBtn.show();
   navMusicBtn.show();
+  navDexBtn.show();
 
   inputBox.show();
   addButton.show();
@@ -249,7 +263,7 @@ function showOnlyMainUI() {
   navHomeBtn.show();
   navTodoBtn.show();
   navMusicBtn.show();
-
+  navDexBtn.show();
   resultButton.show();
 }
 
@@ -259,7 +273,7 @@ function showOnlyResultUI() {
   navHomeBtn.show();
   navTodoBtn.show();
   navMusicBtn.show();
-
+  navDexBtn.show();
   saveImageButton.show();
   musicPageButton.show();
   restartButton.show();
@@ -272,10 +286,18 @@ function showOnlyMusicUI() {
   navHomeBtn.show();
   navTodoBtn.show();
   navMusicBtn.show();
-
+  navDexBtn.show();
   backToMainButton.show();
   stopMusicButton.show();
   musicToggleBtn.show();
+}
+function showOnlyDexUI() {
+  hideAllUI();
+
+  navHomeBtn.show();
+  navTodoBtn.show();
+  navDexBtn.show();
+  navMusicBtn.show();
 }
 
 function positionUI() {
