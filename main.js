@@ -254,8 +254,8 @@ function drawStars() {
       s.tailX = s.x;
       s.tailY = s.y;
 
-      s.x = lerp(s.x, mouseX + random(-120, 120), pullStrength * mouseMovingPower * 1.8);
-      s.y = lerp(s.y, mouseY + random(-120, 120), pullStrength * mouseMovingPower * 1.8);
+      s.x = lerp(s.x, mouseX + random(-60, 60), pullStrength * mouseMovingPower);
+      s.y = lerp(s.y, mouseY + random(-60, 60), pullStrength * mouseMovingPower);
     } else {
       s.x = lerp(s.x, s.homeX, s.speed);
       s.y = lerp(s.y, s.homeY, s.speed);
