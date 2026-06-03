@@ -18,6 +18,8 @@ let loginButton;
 let userId = "";
 let loginMessage = "";
 
+let spaceBg;
+
 // 캐릭터 이미지
 let characters = [];
 let selectedCharacterIndex = 0;
