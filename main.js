@@ -247,15 +247,15 @@ function drawStars() {
 
   for (let s of stars) {
     let d = dist(s.x, s.y, mouseX, mouseY);
-    let pullRange = 260;
+    let pullRange = 420;
     let pullStrength = map(constrain(d, 0, pullRange), 0, pullRange, 0.12, 0);
 
     if (mouseMovingPower > 0.05 && d < pullRange) {
       s.tailX = s.x;
       s.tailY = s.y;
 
-      s.x = lerp(s.x, mouseX + random(-60, 60), pullStrength * mouseMovingPower);
-      s.y = lerp(s.y, mouseY + random(-60, 60), pullStrength * mouseMovingPower);
+      s.x = lerp(s.x, mouseX + random(-120, 120), pullStrength * mouseMovingPower * 1.8);
+      s.y = lerp(s.y, mouseY + random(-120, 120), pullStrength * mouseMovingPower * 1.8);
     } else {
       s.x = lerp(s.x, s.homeX, s.speed);
       s.y = lerp(s.y, s.homeY, s.speed);
