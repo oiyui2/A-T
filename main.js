@@ -333,7 +333,8 @@ function keyPressed() {
       showOnlyLoginUI();
     }
   }
-  function drawScanLines() {
+}
+function drawScanLines() {
   noStroke();
 
   for (let y = 0; y < height; y += 4) {
@@ -367,5 +368,3 @@ function drawSystemHud() {
   drawingContext.shadowBlur = 0;
   textFont("sans-serif");
 }
-}
-
