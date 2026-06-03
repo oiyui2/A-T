@@ -124,9 +124,6 @@ let introInitDots = 0;
 let introInitMaxDots = 3;
 let introDoneShown = false;
 
-// 레이더 화면
-let radarStartTime = 0;
-let radarDuration = 8000;
 
 let radarDots = [
   { angle: 20, dist: 0.35 },
