@@ -213,27 +213,69 @@ return nf(m, 2) + ":" + nf(s, 2);
 
 
 // ============================================================
+let lastMouseX = 0;
+let lastMouseY = 0;
+let mouseMovingPower = 0;
+
 function createStar() {
-return {
-x: random(width),
-y: random(height),
-size: random(2, 5),
-speed: random(0.05, 2),
-brightness: random(150, 255)
-};
+  return {
+    x: random(width),
+    y: random(height),
+    homeX: random(width),
+    homeY: random(height),
+    size: random(1.5, 4),
+    speed: random(0.01, 0.04),
+    twinkle: random(TWO_PI),
+    tailX: 0,
+    tailY: 0
+  };
 }
 
 function drawStars() {
-noStroke();
+  let mouseMove = dist(mouseX, mouseY, lastMouseX, lastMouseY);
 
-for (let s of stars) {
-s.x += (mouseX - s.x) * 0.005 * s.speed;
-s.y += (mouseY - s.y) * 0.005 * s.speed;
+  if (mouseMove > 2) {
+    mouseMovingPower = min(mouseMovingPower + 0.08, 1);
+  } else {
+    mouseMovingPower = max(mouseMovingPower - 0.015, 0);
+  }
 
-let flicker = sin(frameCount * 0.05 + s.brightness) * 40;
-fill(255, 255, 200, s.brightness + flicker);
-ellipse(s.x, s.y, s.size);
-}
+  lastMouseX = mouseX;
+  lastMouseY = mouseY;
+
+  noStroke();
+
+  for (let s of stars) {
+    let d = dist(s.x, s.y, mouseX, mouseY);
+    let pullRange = 260;
+    let pullStrength = map(constrain(d, 0, pullRange), 0, pullRange, 0.12, 0);
+
+    if (mouseMovingPower > 0.05 && d < pullRange) {
+      s.tailX = s.x;
+      s.tailY = s.y;
+
+      s.x = lerp(s.x, mouseX + random(-60, 60), pullStrength * mouseMovingPower);
+      s.y = lerp(s.y, mouseY + random(-60, 60), pullStrength * mouseMovingPower);
+    } else {
+      s.x = lerp(s.x, s.homeX, s.speed);
+      s.y = lerp(s.y, s.homeY, s.speed);
+    }
+
+    let alpha = 120 + sin(frameCount * 0.05 + s.twinkle) * 80;
+
+    if (mouseMovingPower > 0.1 && d < pullRange) {
+      stroke(120, 255, 230, 80 * mouseMovingPower);
+      strokeWeight(1);
+      line(s.tailX, s.tailY, s.x, s.y);
+      noStroke();
+
+      fill(160, 255, 240, alpha + 60);
+      ellipse(s.x, s.y, s.size * 1.8);
+    } else {
+      fill(255, 255, 255, alpha);
+      ellipse(s.x, s.y, s.size);
+    }
+  }
 }
 
 function drawGradientBG(c1, c2) {
