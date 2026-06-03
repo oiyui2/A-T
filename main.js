@@ -279,13 +279,13 @@ function drawStars() {
 }
 
 function drawGradientBG(c1, c2) {
-  if (spaceBg) {
+  if (typeof spaceBg !== "undefined" && spaceBg) {
     imageMode(CORNER);
     image(spaceBg, 0, 0, width, height);
     imageMode(CENTER);
 
     noStroke();
-    fill(0, 0, 0, 80);
+    fill(0, 0, 0, 95);
     rect(0, 0, width, height);
   } else {
     noStroke();
@@ -298,6 +298,8 @@ function drawGradientBG(c1, c2) {
   }
 
   drawStars();
+  drawScanLines();
+  drawSystemHud();
 }
 
 
@@ -331,5 +333,39 @@ function keyPressed() {
       showOnlyLoginUI();
     }
   }
+  function drawScanLines() {
+  noStroke();
+
+  for (let y = 0; y < height; y += 4) {
+    fill(0, 0, 0, 28);
+    rect(0, y, width, 2);
+  }
+
+  fill(95, 255, 224, 8);
+  rect(0, 0, width, height);
+}
+
+function drawSystemHud() {
+  if (currentPage === "intro" || currentPage === "radar" || currentPage === "login") return;
+
+  textFont("Share Tech Mono");
+  textAlign(LEFT, CENTER);
+  textSize(14);
+
+  drawingContext.shadowBlur = 10;
+  drawingContext.shadowColor = "#5fffe0";
+
+  fill(95, 255, 224, 165);
+  text("DATE : 2090.09.21", 32, height - 78);
+  text("MISSION STATUS : ACTIVE", 32, height - 54);
+  text("CREW : PARK / OH", 32, height - 30);
+
+  textAlign(RIGHT, CENTER);
+  text("SIGNAL STRENGTH : 97%", width - 32, height - 54);
+  text("SYSTEM : 2DO ORBITAL TASK", width - 32, height - 30);
+
+  drawingContext.shadowBlur = 0;
+  textFont("sans-serif");
+}
 }
 
