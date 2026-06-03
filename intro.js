@@ -58,10 +58,10 @@ function drawIntroPage() {
 
   drawingContext.shadowBlur = 0;
 
-  fill(67, 224, 192, 180);
-  textAlign(CENTER, CENTER);
-  textSize(16);
-  text("Press F to skip opening sequence", width / 2, height * 0.90);
+  fill(67, 224, 192, 160);
+  textAlign(RIGHT, CENTER);
+  textSize(14);
+  text("Press F to skip opening / radar sequence", width - 40, height - 40);
 
   if (introDoneShown && millis() - introStartTime > introDuration) {
     currentPage = "radar";
