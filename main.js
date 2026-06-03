@@ -47,6 +47,17 @@ function draw() {
   }
 
   positionUI();
+
+  if (currentPage === "login") {
+    loginInput.show();
+    loginButton.show();
+
+    loginInput.position(width / 2 - 250, height * 0.60);
+    loginInput.size(350, 54);
+
+    loginButton.position(width / 2 + 115, height * 0.60);
+    loginButton.size(135, 54);
+}
 }
 
 // ============================================================
