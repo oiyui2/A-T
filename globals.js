@@ -56,6 +56,7 @@ let backToMainButton;
 let stopMusicButton;
 let inventoryCount = 0;
 let rewardClaimed = false;
+let navDexBtn;
 
 // 타이머 패널 상태
 let timerPanelOpen = false;
