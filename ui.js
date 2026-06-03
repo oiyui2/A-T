@@ -118,14 +118,18 @@ function showOnlyDexUI() {
   navMusicBtn.show();
 }
 function styleNavButton(btn) {
-btn.style("font-size", "15px");
-btn.style("border", "none");
-btn.style("border-radius", "999px");
-btn.style("background", "rgba(255,255,255,0.12)");
-btn.style("color", "white");
-btn.style("cursor", "pointer");
-btn.style("font-weight", "bold");
-addHoverEffect(btn, 1.10);
+  btn.style("font-size", "15px");
+  btn.style("border", "1.5px solid rgba(95,255,224,0.85)");
+  btn.style("border-radius", "4px");
+  btn.style("background", "rgba(0, 20, 22, 0.72)");
+  btn.style("color", "#5fffe0");
+  btn.style("cursor", "pointer");
+  btn.style("font-weight", "700");
+  btn.style("font-family", "'Orbitron', 'Share Tech Mono', monospace");
+  btn.style("letter-spacing", "1px");
+  btn.style("box-shadow", "0 0 12px rgba(95,255,224,0.45), inset 0 0 12px rgba(95,255,224,0.12)");
+  btn.style("backdrop-filter", "blur(3px)");
+  addHoverEffect(btn, 1.06);
 }
 
 function navToHome() {
@@ -160,14 +164,16 @@ showOnlyMusicUI();
 }
 
 function positionNav() {
-  let bw = 120, gap = 10, by = 20;
+  let bw = 135;
+  let gap = 12;
+  let by = 22;
   let totalW = bw * 4 + gap * 3;
   let startX = width / 2 - totalW / 2;
 
-  navHomeBtn.size(bw, 42);
-  navTodoBtn.size(bw, 42);
-  navDexBtn.size(bw, 42);
-  navMusicBtn.size(bw, 42);
+  navHomeBtn.size(bw, 46);
+  navTodoBtn.size(bw, 46);
+  navDexBtn.size(bw, 46);
+  navMusicBtn.size(bw, 46);
 
   navHomeBtn.position(startX, by);
   navTodoBtn.position(startX + (bw + gap), by);
@@ -175,13 +181,21 @@ function positionNav() {
   navMusicBtn.position(startX + (bw + gap) * 3, by);
 }
 function updateNavHighlight() {
-  let active = "rgba(124,92,191,0.95)";
-  let idle = "rgba(255,255,255,0.12)";
+  let activeBg = "rgba(95,255,224,0.22)";
+  let idleBg = "rgba(0, 20, 22, 0.72)";
 
-  navHomeBtn.style("background", currentPage === "input" ? active : idle);
-  navTodoBtn.style("background", currentPage === "main" ? active : idle);
-  navDexBtn.style("background", currentPage === "dex" ? active : idle);
-  navMusicBtn.style("background", currentPage === "music" ? active : idle);
+  let activeShadow = "0 0 20px rgba(95,255,224,0.95), inset 0 0 18px rgba(95,255,224,0.25)";
+  let idleShadow = "0 0 12px rgba(95,255,224,0.45), inset 0 0 12px rgba(95,255,224,0.12)";
+
+  navHomeBtn.style("background", currentPage === "input" ? activeBg : idleBg);
+  navTodoBtn.style("background", currentPage === "main" ? activeBg : idleBg);
+  navDexBtn.style("background", currentPage === "dex" ? activeBg : idleBg);
+  navMusicBtn.style("background", currentPage === "music" ? activeBg : idleBg);
+
+  navHomeBtn.style("box-shadow", currentPage === "input" ? activeShadow : idleShadow);
+  navTodoBtn.style("box-shadow", currentPage === "main" ? activeShadow : idleShadow);
+  navDexBtn.style("box-shadow", currentPage === "dex" ? activeShadow : idleShadow);
+  navMusicBtn.style("box-shadow", currentPage === "music" ? activeShadow : idleShadow);
 }
 
 
