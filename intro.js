@@ -8,19 +8,22 @@ let introLines = [
   "완료 기록은 나만의 성장 로그로 저장됩니다.",
   "",
   "Mission Crew : 박서정, 오유현",
-  "",
-  "Initializing Todo Growth System.... Done"
+  ""
 ];
 
 let currentLine = 0;
 let currentChar = 0;
-let typeSpeed = 2;
+let typeSpeed = 4;
 
 function showOnlyIntroUI() {
   hideAllUI();
 }
 
 function drawIntroPage() {
+  if (navHomeBtn) navHomeBtn.hide();
+  if (navTodoBtn) navTodoBtn.hide();
+  if (navMusicBtn) navMusicBtn.hide();
+
   background(0);
 
   drawIntroStars();
@@ -37,7 +40,7 @@ function drawIntroPage() {
   updateIntroTyping();
 
   let startX = width * 0.13;
-  let startY = height * 0.16;
+  let startY = height * 0.14;
   let lineH = 42;
 
   for (let i = 0; i <= currentLine && i < introLines.length; i++) {
@@ -50,19 +53,22 @@ function drawIntroPage() {
     text(lineText, startX, startY + i * lineH);
   }
 
+  let initY = startY + introLines.length * lineH + 25;
+  drawInitializingLine(startX, initY);
+
   drawingContext.shadowBlur = 0;
 
   fill(67, 224, 192, 180);
   textAlign(CENTER, CENTER);
   textSize(16);
-  text("System will move to login page soon...", width / 2, height * 0.88);
+  text("Press F to skip opening sequence", width / 2, height * 0.90);
 
-  if (millis() - introStartTime > introDuration) {
-  currentPage = "radar";
-  radarStartTime = millis();
-  radarCurrentChar = 0;
-  hideAllUI();
-}
+  if (introDoneShown && millis() - introStartTime > introDuration) {
+    currentPage = "radar";
+    radarStartTime = millis();
+    radarCurrentChar = 0;
+    hideAllUI();
+  }
 
   textFont("sans-serif");
 }
@@ -76,6 +82,25 @@ function updateIntroTyping() {
   if (currentChar > introLines[currentLine].length) {
     currentLine++;
     currentChar = 0;
+  }
+}
+
+function drawInitializingLine(x, y) {
+  if (currentLine < introLines.length) return;
+
+  let base = "Initializing Todo Growth System";
+  let dots = ".".repeat(introInitDots);
+  let doneText = introDoneShown ? " Done" : "";
+
+  text(base + dots + doneText, x, y);
+
+  if (frameCount % 28 === 0 && !introDoneShown) {
+    introInitDots++;
+
+    if (introInitDots > introInitMaxDots) {
+      introDoneShown = true;
+      introStartTime = millis();
+    }
   }
 }
 
