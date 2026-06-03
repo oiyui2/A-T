@@ -254,5 +254,17 @@ timerPanelOpen = false;
 openTimerPanel(currentIndex);
   }
 }
-
+function keyPressed() {
+  if (key === "f" || key === "F") {
+    if (currentPage === "intro") {
+      currentPage = "radar";
+      radarStartTime = millis();
+      radarCurrentChar = 0;
+      hideAllUI();
+    } else if (currentPage === "radar") {
+      currentPage = "login";
+      showOnlyLoginUI();
+    }
+  }
+}
 
