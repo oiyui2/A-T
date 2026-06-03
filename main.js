@@ -247,7 +247,7 @@ function drawStars() {
 
   for (let s of stars) {
     let d = dist(s.x, s.y, mouseX, mouseY);
-    let pullRange = 420;
+    let pullRange = 260;
     let pullStrength = map(constrain(d, 0, pullRange), 0, pullRange, 0.12, 0);
 
     if (mouseMovingPower > 0.05 && d < pullRange) {
