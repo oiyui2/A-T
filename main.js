@@ -41,8 +41,7 @@ function draw() {
   } else if (currentPage === "main") {
     drawMainPage();
   } else if (currentPage === "dex") {
-  drawDexPage();
-  }
+    drawDexPage();
   } else if (currentPage === "result") {
     drawResultPage();
   } else if (currentPage === "music") {
