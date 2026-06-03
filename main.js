@@ -279,15 +279,25 @@ function drawStars() {
 }
 
 function drawGradientBG(c1, c2) {
-noStroke();
+  if (spaceBg) {
+    imageMode(CORNER);
+    image(spaceBg, 0, 0, width, height);
+    imageMode(CENTER);
 
-for (let y = 0; y < height; y++) {
-let inter = map(y, 0, height, 0, 1);
-fill(lerpColor(c1, c2, inter));
-rect(0, y, width, 1);
-}
+    noStroke();
+    fill(0, 0, 0, 80);
+    rect(0, 0, width, height);
+  } else {
+    noStroke();
 
-drawStars();
+    for (let y = 0; y < height; y++) {
+      let inter = map(y, 0, height, 0, 1);
+      fill(lerpColor(c1, c2, inter));
+      rect(0, y, width, 1);
+    }
+  }
+
+  drawStars();
 }
 
 
