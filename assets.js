@@ -7,7 +7,7 @@ loadImage("images/3단계불.png"),
 loadImage("images/4단계불.png"),
 loadImage("images/5단계불.png")
 ];
-
+spaceBg = loadImage("images/space-bg.jpg");
 // 1번 캐릭터: 구름
 characters[1] = [
 loadImage("images/1단계구름.png"),
