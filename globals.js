@@ -126,3 +126,8 @@ let radarTypeSpeed = 3;
 let introInitDots = 0;
 let introInitMaxDots = 3;
 let introDoneShown = false;
+
+let lastMouseX = 0;
+let lastMouseY = 0;
+let mouseMovingPower = 0;
+let spaceBg;
