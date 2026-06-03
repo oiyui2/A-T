@@ -40,6 +40,9 @@ function draw() {
     drawInputPage();
   } else if (currentPage === "main") {
     drawMainPage();
+  } else if (currentPage === "dex") {
+  drawDexPage();
+  }
   } else if (currentPage === "result") {
     drawResultPage();
   } else if (currentPage === "music") {
