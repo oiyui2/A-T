@@ -1,4 +1,8 @@
 function drawRadarPage() {
+  if (navHomeBtn) navHomeBtn.hide();
+  if (navTodoBtn) navTodoBtn.hide();
+  if (navMusicBtn) navMusicBtn.hide();
+
   background(0);
 
   drawIntroStars();
