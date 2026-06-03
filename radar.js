@@ -56,11 +56,7 @@ function drawRadar() {
 
   for (let i = 0; i < 80; i++) {
     let a = TWO_PI / 80 * i;
-    let x1 = cx + cos(a) * r;
-    let y1 = cy + sin(a) * r;
-    let x2 = cx + cos(a) * (r + 10);
-    let y2 = cy + sin(a) * (r + 10);
-    line(x1, y1, x2, y2);
+    line(cx + cos(a) * r, cy + sin(a) * r, cx + cos(a) * (r + 10), cy + sin(a) * (r + 10));
   }
 
   let sweepAngle = frameCount * 0.035;
@@ -140,25 +136,24 @@ function drawRadarText() {
   fill(67, 224, 192, 150);
   text("SIGNAL DETECTION : 7 OBJECTS / STATUS : ANALYZING", width / 2, height * 0.90);
 
+  textAlign(RIGHT, CENTER);
+  textSize(14);
+  text("Press F to skip radar sequence", width - 40, height - 40);
+
   drawingContext.shadowBlur = 0;
   textFont("sans-serif");
 }
 
 function angleDifference(a, b) {
-  let diff = (a - b + PI) % TWO_PI - PI;
-  return diff;
+  return (a - b + PI) % TWO_PI - PI;
 }
 
 function drawStaticNoise() {
   noStroke();
 
   for (let i = 0; i < 130; i++) {
-    let x = random(width);
-    let y = random(height);
-    let alpha = random(10, 65);
-
-    fill(120, 255, 230, alpha);
-    rect(x, y, random(1, 4), random(1, 3));
+    fill(120, 255, 230, random(10, 65));
+    rect(random(width), random(height), random(1, 4), random(1, 3));
   }
 
   if (frameCount % 18 === 0) {
