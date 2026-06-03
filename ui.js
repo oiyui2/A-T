@@ -397,10 +397,22 @@ function drawInputPage() {
 drawGradientBG(color(20, 10, 50), color(60, 20, 80));
 
 // 제목
-fill(255);
+fill(95, 255, 224);
+textFont("Orbitron");
 textStyle(BOLD);
-textSize(min(width, height) * 0.060);
-text("2DO", width / 2, height * 0.10);
+drawingContext.shadowBlur = 18;
+drawingContext.shadowColor = "#5fffe0";
+textSize(min(width, height) * 0.050);
+text("MISSION CONTROL SYSTEM", width / 2, height * 0.12);
+
+textStyle(NORMAL);
+textFont("Share Tech Mono");
+fill(180, 255, 240);
+textSize(min(width, height) * 0.025);
+text("Today Mission Registration", width / 2, height * 0.19);
+
+drawingContext.shadowBlur = 0;
+textFont("sans-serif");
 
 // 부제목
 textStyle(NORMAL);
