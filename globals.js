@@ -18,7 +18,7 @@ let loginButton;
 let userId = "";
 let loginMessage = "";
 
-let spaceBg;
+
 
 // 캐릭터 이미지
 let characters = [];
@@ -127,7 +127,8 @@ let introInitDots = 0;
 let introInitMaxDots = 3;
 let introDoneShown = false;
 
+let spaceBg;
+
 let lastMouseX = 0;
 let lastMouseY = 0;
 let mouseMovingPower = 0;
-let spaceBg;
