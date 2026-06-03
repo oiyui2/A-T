@@ -235,9 +235,9 @@ function drawStars() {
   let mouseMove = dist(mouseX, mouseY, lastMouseX, lastMouseY);
 
   if (mouseMove > 2) {
-    mouseMovingPower = min(mouseMovingPower + 0.08, 1);
+    mouseMovingPower = min(mouseMovingPower + 0.06, 1);
   } else {
-    mouseMovingPower = max(mouseMovingPower - 0.015, 0);
+    mouseMovingPower = max(mouseMovingPower - 0.02, 0);
   }
 
   lastMouseX = mouseX;
@@ -247,30 +247,30 @@ function drawStars() {
 
   for (let s of stars) {
     let d = dist(s.x, s.y, mouseX, mouseY);
-    let pullRange = 260;
-    let pullStrength = map(constrain(d, 0, pullRange), 0, pullRange, 0.12, 0);
+    let pullRange = 380;
+    let pullStrength = map(constrain(d, 0, pullRange), 0, pullRange, 0.08, 0);
 
     if (mouseMovingPower > 0.05 && d < pullRange) {
       s.tailX = s.x;
       s.tailY = s.y;
 
-      s.x = lerp(s.x, mouseX + random(-60, 60), pullStrength * mouseMovingPower);
-      s.y = lerp(s.y, mouseY + random(-60, 60), pullStrength * mouseMovingPower);
+      s.x = lerp(s.x, mouseX, pullStrength * mouseMovingPower);
+      s.y = lerp(s.y, mouseY, pullStrength * mouseMovingPower);
     } else {
       s.x = lerp(s.x, s.homeX, s.speed);
       s.y = lerp(s.y, s.homeY, s.speed);
     }
 
-    let alpha = 120 + sin(frameCount * 0.05 + s.twinkle) * 80;
+    let alpha = 130 + sin(frameCount * 0.04 + s.twinkle) * 70;
 
     if (mouseMovingPower > 0.1 && d < pullRange) {
-      stroke(120, 255, 230, 80 * mouseMovingPower);
+      stroke(255, 255, 255, 80 * mouseMovingPower);
       strokeWeight(1);
       line(s.tailX, s.tailY, s.x, s.y);
       noStroke();
 
-      fill(160, 255, 240, alpha + 60);
-      ellipse(s.x, s.y, s.size * 1.8);
+      fill(255, 255, 255, alpha + 50);
+      ellipse(s.x, s.y, s.size * 1.5);
     } else {
       fill(255, 255, 255, alpha);
       ellipse(s.x, s.y, s.size);
