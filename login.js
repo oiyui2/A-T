@@ -9,7 +9,7 @@ function buildLoginUI() {
   loginInput.style("color", "#43e0c0");
   loginInput.style("outline", "none");
   loginInput.style("font-family", "'Share Tech Mono', monospace");
-
+  loginInput.style("box-sizing", "border-box");
   loginInput.elt.addEventListener("keydown", function(e) {
     if (e.key === "Enter") {
       loginUser();
@@ -25,6 +25,7 @@ function buildLoginUI() {
   loginButton.style("color", "#43e0c0");
   loginButton.style("font-family", "'Share Tech Mono', monospace");
   loginButton.style("cursor", "pointer");
+  loginButton.style("box-sizing", "border-box");
   loginButton.mousePressed(loginUser);
 }
 
@@ -35,6 +36,9 @@ function showOnlyLoginUI() {
 }
 
 function drawLoginPage() {
+  if (navHomeBtn) navHomeBtn.hide();
+  if (navTodoBtn) navTodoBtn.hide();
+  if (navMusicBtn) navMusicBtn.hide();
   background(0);
 
   drawIntroStars();
@@ -64,11 +68,11 @@ function drawLoginPage() {
 
   drawingContext.shadowBlur = 0;
 
-  loginInput.position(width / 2 - 180, height * 0.53);
-  loginInput.size(260, 46);
+  loginInput.position(width / 2 - 250, panelY + 215);
+  loginInput.size(350, 54);
 
-  loginButton.position(width / 2 + 95, height * 0.53);
-  loginButton.size(100, 46);
+  loginButton.position(width / 2 + 115, panelY + 215);
+  loginButton.size(135, 54);
 
   textFont("sans-serif");
 }
@@ -82,7 +86,14 @@ function loginUser() {
   }
 
   userId = value;
-  localStorage.setItem("twoDoUserId", userId);
+  localStorage.setItem("twoDoLastUserId", userId);
+
+  loadInventory();
+
+  todoList = [];
+  messageText = "";
+  loadedFromSave = false;
+  rewardClaimed = false;
 
   currentPage = "input";
   showOnlyInputUI();
