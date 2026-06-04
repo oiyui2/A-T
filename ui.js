@@ -234,6 +234,11 @@ function styleSciButton(btn, glowColor) {
   btn.style("font-weight", "700");
   btn.style("font-family", "'Share Tech Mono', monospace");
   btn.style("letter-spacing", "1px");
+  btn.style("white-space", "nowrap");
+  btn.style("line-height", "1");
+  btn.style("display", "flex");
+  btn.style("align-items", "center");
+  btn.style("justify-content", "center");
   btn.style("box-shadow", "0 0 14px " + glowColor + "66, inset 0 0 16px " + glowColor + "22");
   btn.style("backdrop-filter", "blur(3px)");
   addHoverEffect(btn, 1.04);
@@ -354,8 +359,8 @@ function positionUI() {
     loadButton.position(width * 0.43 - 180, height * 0.62);
     resetAllButton.position(width * 0.43 - 180, height * 0.72);
 
-    fullscreenButton.size(130, 46);
-    fullscreenButton.position(width - 165, 32);
+    fullscreenButton.size(180, 54);
+    fullscreenButton.position(width - 210, 32);
   }
 
   if (currentPage === "main") {
