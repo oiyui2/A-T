@@ -134,11 +134,65 @@ let lastMouseY = 0;
 let mouseMovingPower = 0;
 
 // 배경 별 관련
-let spaceLayer;
-let warpStars = [];
-const WARP_STAR_COUNT = 1000;
+class WarpStar {
+  constructor() {
+    this.reset();
+  }
 
-let planetAngle = 0;
-let spaceBgReady = false;
+  reset() {
+    let angle = random(TWO_PI);
+    let radius = max(width, height) * random(0.3, 1.05);
+
+    this.startX = width / 2 + cos(angle) * radius;
+    this.startY = height / 2 + sin(angle) * radius;
+
+    this.progress = random();
+    this.speed = random(0.0007, 0.006);
+    this.baseSize = random(0.5, 2);
+    this.baseBrightness = random(100, 255);
+    this.twinkleOffset = random(2000);
+  }
+
+  update() {
+    this.progress += this.speed;
+
+    if (this.progress >= 1) {
+      this.reset();
+    }
+  }
+
+  display(g) {
+    let cx = width / 2;
+    let cy = height / 2;
+
+    let x = lerp(this.startX, cx, this.progress);
+    let y = lerp(this.startY, cy, this.progress);
+
+    let scale = map(this.progress, 0, 1, 0.3, 3);
+
+    let twinkle = map(
+      sin(frameCount * 0.04 + this.twinkleOffset),
+      -1,
+      1,
+      0.7,
+      1.3
+    );
+
+    let brightness = this.baseBrightness * twinkle;
+    let size = this.baseSize * scale * twinkle;
+    let alpha = map(this.progress, 0, 1, 255, 0);
+
+    g.noStroke();
+    g.fill(brightness, brightness, brightness, alpha);
+    g.circle(x, y, size);
+  }
+}
+
+function drawWarpStarfield(g) {
+  for (let star of warpStars) {
+    star.update();
+    star.display(g);
+  }
+}
 
 
