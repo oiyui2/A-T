@@ -6,6 +6,8 @@ function setup() {
   imageMode(CENTER);
   textAlign(CENTER, CENTER);
 
+  initSpaceBackground();
+
   loadInventory();
 
   for (let i = 0; i < 30; i++) {
@@ -18,10 +20,12 @@ function setup() {
   buildMusicPageUI();
   buildNavBar();
   buildLoginUI();
-
+  
   introStartTime = millis();
-  showOnlyIntroUI();
+  showOnlyInputUI();
+ 
 }
+
 
 // ============================================================
 // draw
@@ -296,6 +300,8 @@ function drawGradientBG(c1, c2) {
       rect(0, y, width, 1);
     }
   }
+ 
+  drawSpaceVoyageBackground();
 
   drawStars();
   drawScanLines();
@@ -336,6 +342,95 @@ function drawSystemHud() {
   drawingContext.shadowBlur = 0;
   textFont("sans-serif");
 }
+
+//배경 별 함
+function initSpaceBackground() {
+  spaceLayer = createGraphics(windowWidth, windowHeight, WEBGL);
+  warpStars = [];
+
+  for (let i = 0; i < WARP_STAR_COUNT; i++) {
+    warpStars.push(new WarpStar());
+  }
+
+  spaceBgReady = true;
+}
+
+function drawSpaceVoyageBackground() {
+  if (!spaceBgReady || !spaceLayer) {
+    background(0);
+    return;
+  }
+
+  renderSpaceLayer();
+
+  push();
+  imageMode(CORNER);
+  image(spaceLayer, 0, 0, width, height);
+  pop();
+
+  drawSpaceOverlay2D();
+}
+
+//구 렌더링
+function renderSpaceLayer() {
+  let g = spaceLayer;
+
+  g.background(0);
+
+  g.push();
+  g.translate(-width / 2, -height / 2, 0);
+  drawWarpStarfield(g);
+  g.pop();
+
+  g.ambientLight(70);
+
+  g.directionalLight(
+    245,
+    220,
+    253,
+    -1,
+    -1,
+    -1
+  );
+
+  let lightX = cos(frameCount * 0.01) * 500;
+  let lightZ = sin(frameCount * 0.01) * 500;
+
+  g.pointLight(
+    255,
+    255,
+    255,
+    lightX,
+    0,
+    lightZ
+  );
+
+  g.noStroke();
+
+  g.push();
+  g.translate(lightX, 0, lightZ);
+  g.emissiveMaterial(25, 22, 10);
+  g.sphere(16);
+  g.pop();
+
+  g.push();
+
+  let planetX = width * 0.28;
+  let planetY = height * 0.02;
+
+  g.translate(planetX, planetY, 0);
+  g.rotateY(frameCount * 0.005);
+  g.rotateX(-0.18);
+
+  g.ambientMaterial("#ddffaa");
+  g.sphere(min(width, height) * 0.13, 64, 64);
+
+  g.pop();
+
+  drawSpaceRings3D(g);
+}
+
+
 
 // ============================================================
 // 창 크기 변경 대응
