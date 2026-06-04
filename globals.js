@@ -132,3 +132,13 @@ let spaceBg;
 let lastMouseX = 0;
 let lastMouseY = 0;
 let mouseMovingPower = 0;
+
+// 배경 별 관련
+let spaceLayer;
+let warpStars = [];
+const WARP_STAR_COUNT = 1000;
+
+let planetAngle = 0;
+let spaceBgReady = false;
+
+
