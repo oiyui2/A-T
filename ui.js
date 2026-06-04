@@ -47,16 +47,16 @@ function buildMainPageUI() {
 }
 
 function buildResultPageUI() {
-  saveImageButton = createButton("결과 이미지 저장");
-  styleButton(saveImageButton, "#e8578a");
+  saveImageButton = createButton("▣ 결과 이미지 저장");
+  styleSciButton(saveImageButton, "#ff5fa2");
   saveImageButton.mousePressed(downloadResultImage);
 
-  musicPageButton = createButton("곡 플레이 화면");
-  styleButton(musicPageButton, "#7c5cbf");
+  musicPageButton = createButton("▣ 곡 플레이 화면");
+  styleSciButton(musicPageButton, "#b47cff");
   musicPageButton.mousePressed(goToMusicPage);
 
-  restartButton = createButton("새 할 일 시작");
-  styleButton(restartButton, "#5f6fbf");
+  restartButton = createButton("▣ 새 할 일 시작");
+  styleSciButton(restartButton, "#7ea0ff");
   restartButton.mousePressed(restartProgram);
 }
 
@@ -368,10 +368,15 @@ function positionUI() {
   }
 
   if (currentPage === "result") {
-    saveImageButton.position(width / 2 - 320, height * 0.88);
-    musicPageButton.position(width / 2 - 145, height * 0.88);
-    restartButton.position(width / 2 + 25, height * 0.88);
-    resetAllButton.position(width / 2 + 175, height * 0.88);
+    saveImageButton.size(180, 54);
+    musicPageButton.size(180, 54);
+    restartButton.size(180, 54);
+    resetAllButton.size(200, 54);
+
+    saveImageButton.position(width / 2 - 390, height * 0.90);
+    musicPageButton.position(width / 2 - 195, height * 0.90);
+    restartButton.position(width / 2, height * 0.90);
+    resetAllButton.position(width / 2 + 195, height * 0.90);
   }
 
   if (currentPage === "music") {
@@ -870,54 +875,70 @@ function goToResultPage() {
 }
 
 function drawResultPage() {
-  drawGradientBG(color(20, 10, 50), color(60, 20, 80));
+  drawGradientBG(color(0, 5, 12), color(0, 20, 25));
 
   let doneCount = countDone();
   let totalCount = todoList.length;
   let percent = totalCount > 0 ? floor((doneCount / totalCount) * 100) : 0;
   let stageIndex = getStageIndex(doneCount, totalCount);
 
-  fill(255);
+  textAlign(CENTER, CENTER);
+
+  drawingContext.shadowBlur = 22;
+  drawingContext.shadowColor = "#5fffe0";
+
+  textFont("Orbitron");
   textStyle(BOLD);
-  textSize(min(width, height) * 0.065);
-  text("오늘의 완료 기록", width / 2, height * 0.13);
+  fill(95, 255, 224);
+  textSize(min(width, height) * 0.056);
+  text("MISSION COMPLETE LOG", width / 2, height * 0.14);
+
+  drawingContext.shadowBlur = 0;
 
   textStyle(NORMAL);
-  fill(220, 210, 255);
-  textSize(min(width, height) * 0.032);
-  text("완료한 할 일: " + doneCount + " / " + totalCount, width / 2, height * 0.25);
-  text("완료율: " + percent + "%", width / 2, height * 0.31);
+  textFont("Share Tech Mono");
+
+  fill(190, 255, 245);
+  textSize(24);
+  text("Completed Mission : " + doneCount + " / " + totalCount, width / 2, height * 0.24);
+  text("Completion Rate : " + percent + "%", width / 2, height * 0.29);
 
   if (percent === 100) {
-    fill(180, 255, 200);
-    text("오늘의 캐릭터를 획득했습니다!", width / 2, height * 0.38);
+    fill(150, 255, 190);
+    text("NEW ENTITY ACQUIRED", width / 2, height * 0.36);
   } else {
-    fill(255, 180, 200);
-    text("완료율 100%가 되면 캐릭터를 획득할 수 있습니다.", width / 2, height * 0.38);
+    fill(255, 150, 180);
+    text("Complete 100% to acquire entity data", width / 2, height * 0.36);
   }
+
+  let charSize = min(width, height) * 0.52;
+
+  drawingContext.shadowBlur = 24;
+  drawingContext.shadowColor = "#5fffe0";
+
+  noStroke();
+  fill(95, 255, 224, 35);
+  ellipse(width / 2, height * 0.55, charSize * 0.85, charSize * 0.85);
 
   image(
     getCurrentCharacterImage(stageIndex),
     width / 2,
-    height * 0.56,
-    min(width, height) * 0.28,
-    min(width, height) * 0.28
+    height * 0.55,
+    charSize,
+    charSize
   );
 
+  drawingContext.shadowBlur = 0;
+
   fill(255);
-  textSize(min(width, height) * 0.027);
-  text("보유한 캐릭터 개수: " + inventoryCount + "개", width / 2, height * 0.76);
+  textSize(24);
+  text("Collected Entities : " + inventoryCount, width / 2, height * 0.78);
 
-  fill(220, 210, 255);
-  textSize(16);
-  text("이 화면은 이미지로 저장할 수 있습니다.", width / 2, height * 0.82);
-
+  fill(190, 255, 245);
   textSize(15);
-  text("제작자: " + creatorNames, width / 2, height * 0.86);
+  text("This log can be exported as an image.", width / 2, height * 0.83);
 
-  if (creatorSchool !== "") {
-    text("소속: " + creatorSchool, width / 2, height * 0.89);
-  }
+  textFont("sans-serif");
 }
 
 function downloadResultImage() {
