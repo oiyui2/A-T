@@ -35,12 +35,12 @@ loadImage("images/4단계구.png"),
 loadImage("images/5단계구.png")
 ];
 
-songSounds[0] = loadSound("sounds/song1.mp3");
-// songSounds[1] = loadSound("sounds/song2.mp3");
-// songSounds[2] = loadSound("sounds/song3.mp3");
-// songSounds[3] = loadSound("sounds/song4.mp3");
-// songSounds[4] = loadSound("sounds/song5.mp3");
-// songSounds[5] = loadSound("sounds/song6.mp3");
+songSounds[0] = loadSound("sounds/2do3-BigRideEdit_140_SnareSplash_FX_4bars.wav");
+songSounds[1] = loadSound("sounds/song2.mp3");
+songSounds[2] = loadSound("sounds/song3.mp3");
+songSounds[3] = loadSound("sounds/song4.mp3");
+songSounds[4] = loadSound("sounds/song5.mp3");
+songSounds[5] = loadSound("sounds/song6.mp3");
 }
 
 // ============================================================
