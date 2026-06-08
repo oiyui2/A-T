@@ -99,7 +99,7 @@ function drawLoginPage() {
   text("USER IDENTIFICATION SYSTEM", width / 2, panelY + 80);
 
   textSize(24);
-  text("당신의 아이디를 입력하세요", width / 2, panelY + 135);
+  text("아이디를 입력하세요", width / 2, panelY + 135);
 
   textSize(15);
   fill(67, 224, 192, 180);
@@ -145,5 +145,6 @@ function loginUser() {
 
   currentPage = "input";
   showOnlyInputUI();
+  playValidClickSound();
 }
 
