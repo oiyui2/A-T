@@ -46,6 +46,7 @@ function loadProgress() {
   messageText = userId + "님의 저장 기록을 불러왔습니다.";
 
   showOnlyInputUI();
+  playValidClickSound();
 }
 
 function normalizeTodoTimers() {
@@ -127,6 +128,7 @@ function restartProgram() {
 
   currentPage = "input";
   showOnlyInputUI();
+  playValidClickSound();
 }
 
 function resetAllData() {
@@ -159,4 +161,5 @@ function resetAllData() {
 
   currentPage = "input";
   showOnlyInputUI();
+  playValidClickSound();
 }
