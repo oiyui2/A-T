@@ -61,16 +61,16 @@ function buildResultPageUI() {
 }
 
 function buildMusicPageUI() {
-  backToMainButton = createButton("결과 화면으로");
-  styleButton(backToMainButton, "#7c5cbf");
+  backToMainButton = createButton("RETURN");
+  styleSciButton(backToMainButton, "#b47cff");
   backToMainButton.mousePressed(goBackToResultPage);
 
-  stopMusicButton = createButton("노래 멈추기");
-  styleButton(stopMusicButton, "#555");
+  stopMusicButton = createButton("STOP SIGNAL");
+  styleSciButton(stopMusicButton, "#5fffe0");
   stopMusicButton.mousePressed(stopAllSongs);
 
-  musicToggleBtn = createButton("🔊 곡 재생: 켜짐");
-  styleButton(musicToggleBtn, "#5cb85c");
+  musicToggleBtn = createButton("AUDIO ON");
+  styleSciButton(musicToggleBtn, "#5fffe0");
   musicToggleBtn.mousePressed(toggleMusicEnabled);
 }
 
@@ -78,12 +78,12 @@ function toggleMusicEnabled() {
   musicEnabled = !musicEnabled;
 
   if (musicEnabled) {
-    musicToggleBtn.html("🔊 곡 재생: 켜짐");
-    musicToggleBtn.style("background", "#5cb85c");
+    musicToggleBtn.html("AUDIO ON");
+    musicToggleBtn.style("color", "#5fffe0");
     syncLayeredMusicToProgress();
   } else {
-    musicToggleBtn.html("🔇 곡 재생: 꺼짐");
-    musicToggleBtn.style("background", "#999");
+    musicToggleBtn.html("AUDIO OFF");
+    musicToggleBtn.style("color", "#ff8fb3");
     stopAllSongs();
   }
 }
@@ -388,15 +388,15 @@ function positionUI() {
     resetAllButton.position(width / 2 + 195, height * 0.90);
   }
 
-  if (currentPage === "music") {
-    musicToggleBtn.size(180, 56);
-    stopMusicButton.size(150, 56);
-    backToMainButton.size(150, 56);
+ if (currentPage === "music") {
+  musicToggleBtn.size(170, 54);
+  stopMusicButton.size(180, 54);
+  backToMainButton.size(150, 54);
 
-    musicToggleBtn.position(width - 520, height - 84);
-    stopMusicButton.position(width - 350, height - 84);
-    backToMainButton.position(width - 180, height - 84);
-  }
+  musicToggleBtn.position(width - 560, height - 84);
+  stopMusicButton.position(width - 370, height - 84);
+  backToMainButton.position(width - 180, height - 84);
+}
 }
 
 // ============================================================
