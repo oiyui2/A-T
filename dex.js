@@ -166,6 +166,7 @@ function getDexNodePosition(index) {
 function handleDexClick() {
   if (dexPopupRecordIndex >= 0) {
     dexPopupRecordIndex = -1;
+    playValidClickSound();
     return;
   }
 
@@ -174,6 +175,7 @@ function handleDexClick() {
 
     if (dist(mouseX, mouseY, pos.x, pos.y) < 58) {
       dexPopupRecordIndex = i;
+      playValidClickSound();
       return;
     }
   }
