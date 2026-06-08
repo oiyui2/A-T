@@ -9,7 +9,7 @@ function drawDexPage() {
 
   fill(220, 210, 255);
   textSize(20);
-  text("보유 캐릭터: " + inventoryCount + " / 7", width / 2, height * 0.20);
+  text("보유 캐릭터: " + inventoryCount + " / ?", width / 2, height * 0.20);
 
   drawDexRadar();
   drawDexExplorationPopup();
@@ -39,7 +39,6 @@ function drawDexRadar() {
     line(cx, cy, cx + cos(a) * r, cy + sin(a) * r);
   }
 
-  // 돌아가는 레이더 빔
   let sweepAngle = frameCount * 0.035;
   let beamWidth = radians(36);
 
@@ -58,8 +57,7 @@ function drawDexRadar() {
     endShape(CLOSE);
   }
 
-  // 도감 점 / 캐릭터
-  for (let i = 0; i < radarDots.length; i++) {
+  for (let i = 0; i < min(inventoryCount, radarDots.length); i++) {
     let pos = getDexNodePosition(i);
     let a = pos.angle;
     let x = pos.x;
@@ -68,52 +66,77 @@ function drawDexRadar() {
     let diff = abs(angleDifference(sweepAngle, a));
     let hit = diff < radians(8);
 
-    if (i < inventoryCount) {
-      let charIndex = i % characters.length;
-      let img = characters[charIndex][4];
+    let charIndex = i % characters.length;
+    let img = characters[charIndex][4];
 
-      // 보유 캐릭터: 캐릭터는 계속 보이고, 레이더가 닿으면 바탕 원만 깜빡
-      noStroke();
+    noStroke();
 
-      if (hit) {
-        fill(67, 224, 192, 95);
-        ellipse(x, y, 118 + sin(frameCount * 0.4) * 8, 118 + sin(frameCount * 0.4) * 8);
-      } else {
-        fill(67, 224, 192, 35);
-        ellipse(x, y, 100, 100);
-      }
-
-      image(img, x, y, 90, 90);
-
-      fill(180, 255, 220);
-      textSize(13);
-      text("UNLOCKED", x, y + 62);
-
+    if (hit) {
+      fill(67, 224, 192, 95);
+      ellipse(x, y, 118 + sin(frameCount * 0.4) * 8, 118 + sin(frameCount * 0.4) * 8);
     } else {
-      // 미보유 캐릭터: 점만 있다가 레이더가 닿으면 깜빡
-      noStroke();
+      fill(67, 224, 192, 35);
+      ellipse(x, y, 100, 100);
+    }
 
-      if (hit) {
-        drawingContext.shadowBlur = 25;
-        drawingContext.shadowColor = "#ffff66";
-        fill(255, 255, 80, 240);
-        ellipse(x, y, 16, 16);
+    image(img, x, y, 90, 90);
+  }
 
-        noFill();
-        stroke(255, 255, 80, 180);
-        strokeWeight(2);
-        ellipse(x, y, 32 + sin(frameCount * 0.4) * 6);
-        drawingContext.shadowBlur = 18;
-        drawingContext.shadowColor = "#43e0c0";
-      } else {
-        fill(67, 224, 192, 80);
-        ellipse(x, y, 12, 12);
-      }
+  drawUnknownDexDots(cx, cy, r, sweepAngle);
 
-      noStroke();
-      fill(180, 255, 220, 120);
-      textSize(13);
-      text("LOCKED", x, y + 28);
+  drawingContext.shadowBlur = 0;
+}
+
+function drawUnknownDexDots(cx, cy, r, sweepAngle) {
+  let unknownDots = [
+    { angle: 8, dist: 0.76, size: 9 },
+    { angle: 26, dist: 0.88, size: 7 },
+    { angle: 48, dist: 0.69, size: 8 },
+    { angle: 72, dist: 0.82, size: 6 },
+    { angle: 96, dist: 0.74, size: 9 },
+    { angle: 118, dist: 0.91, size: 7 },
+    { angle: 142, dist: 0.77, size: 8 },
+    { angle: 168, dist: 0.86, size: 6 },
+    { angle: 196, dist: 0.71, size: 9 },
+    { angle: 219, dist: 0.90, size: 7 },
+    { angle: 244, dist: 0.78, size: 8 },
+    { angle: 263, dist: 0.93, size: 6 },
+    { angle: 287, dist: 0.70, size: 9 },
+    { angle: 312, dist: 0.84, size: 7 },
+    { angle: 338, dist: 0.76, size: 8 },
+    { angle: 354, dist: 0.90, size: 6 },
+    { angle: 37, dist: 0.47, size: 7 },
+    { angle: 154, dist: 0.52, size: 6 },
+    { angle: 231, dist: 0.49, size: 7 },
+    { angle: 326, dist: 0.55, size: 6 }
+  ];
+
+  for (let i = 0; i < unknownDots.length; i++) {
+    let dot = unknownDots[i];
+    let a = radians(dot.angle);
+    let x = cx + cos(a) * r * dot.dist;
+    let y = cy + sin(a) * r * dot.dist;
+
+    let diff = abs(angleDifference(sweepAngle, a));
+    let hit = diff < radians(7);
+
+    noStroke();
+
+    if (hit) {
+      drawingContext.shadowBlur = 22;
+      drawingContext.shadowColor = "#ffff66";
+      fill(255, 255, 120, 230);
+      ellipse(x, y, dot.size + 7, dot.size + 7);
+
+      noFill();
+      stroke(255, 255, 120, 150);
+      strokeWeight(2);
+      ellipse(x, y, 28 + sin(frameCount * 0.4) * 5);
+    } else {
+      drawingContext.shadowBlur = 10;
+      drawingContext.shadowColor = "#43e0c0";
+      fill(67, 224, 192, 150);
+      ellipse(x, y, dot.size, dot.size);
     }
   }
 
