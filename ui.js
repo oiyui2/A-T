@@ -75,6 +75,7 @@ function buildMusicPageUI() {
 }
 
 function toggleMusicEnabled() {
+  playValidClickSound();
   musicEnabled = !musicEnabled;
 
   if (musicEnabled) {
@@ -123,8 +124,10 @@ function styleNavButton(btn) {
 
 function navToHome() {
   closeTimerPanel();
+  stopLayeredMusic();
   currentPage = "input";
   showOnlyInputUI();
+  playValidClickSound();
 }
 
 function navToTodo() {
@@ -149,6 +152,8 @@ function navToTodo() {
 
   currentPage = "main";
   showOnlyMainUI();
+  stopHomeMusic();
+  playValidClickSound();
   syncLayeredMusicToProgress();
   saveProgress();
 }
@@ -157,12 +162,14 @@ function navToDex() {
   closeTimerPanel();
   currentPage = "dex";
   showOnlyDexUI();
+  playValidClickSound();
 }
 
 function navToMusic() {
   closeTimerPanel();
   currentPage = "music";
   showOnlyMusicUI();
+  playValidClickSound();
 }
 
 function positionNav() {
@@ -411,6 +418,7 @@ function positionUI() {
 function turnOnFullscreen() {
   fullscreen(true);
   resizeCanvas(windowWidth, windowHeight);
+  playValidClickSound();
 }
 
 // ============================================================
@@ -560,6 +568,7 @@ function addTodo() {
   inputBox.elt.focus();
 
   saveProgress();
+  playValidClickSound();
 }
 
 function goToMainPage() {
@@ -583,6 +592,8 @@ function goToMainPage() {
 
   createPathNodes();
   showOnlyMainUI();
+  stopHomeMusic();
+  playValidClickSound();
   syncLayeredMusicToProgress();
 
   saveProgress();
@@ -624,7 +635,7 @@ function drawMainInfoText() {
   fill(220, 210, 255);
   noStroke();
   textSize(16);
-  text("시계 버튼을 눌러 목표 시간을 설정하고, 재생 버튼으로 타이머를 시작하세요.", width / 2, height - 35);
+  text("할 일을 완수할수록 소리를 획득합니다. 타이머를 이용해 시간을 관리하세요. 캐릭터를 클릭해 나만의 로그를 남겨 보세요.", width / 2, height - 35);
 }
 
 function drawMainCharacter() {
@@ -1110,6 +1121,7 @@ function goToResultPage() {
 
   showOnlyResultUI();
   saveProgress();
+  playValidClickSound();
 }
 
 function createExplorationRecord() {
@@ -1212,6 +1224,7 @@ function downloadResultImage() {
 function goToMusicPage() {
   currentPage = "music";
   showOnlyMusicUI();
+  playValidClickSound();
 }
 
 function goBackToResultPage() {
@@ -1219,4 +1232,5 @@ function goBackToResultPage() {
 
   currentPage = "result";
   showOnlyResultUI();
+  playValidClickSound();
 }
