@@ -6,9 +6,8 @@ function setup() {
   imageMode(CENTER);
   textAlign(CENTER, CENTER);
 
-  initSpaceBackground();
-
   loadInventory();
+  loadLayeredMusicSets();
 
   for (let i = 0; i < 30; i++) {
     stars.push(createStar());
@@ -20,12 +19,10 @@ function setup() {
   buildMusicPageUI();
   buildNavBar();
   buildLoginUI();
-  
-  introStartTime = millis();
-  showOnlyInputUI();
- 
-}
 
+  introStartTime = millis();
+  showOnlyIntroUI();
+}
 
 // ============================================================
 // draw
@@ -70,11 +67,16 @@ function draw() {
 
 function mousePressed() {
   if (currentPage === "main") {
-    if (timerPanelOpen) {
-      let px = width / 2 - 520 / 2;
-      let py = height / 2 - 420 / 2;
+    if (isClickOnCharacterLogUI()) {
+      if (characterLogInput) characterLogInput.elt.focus();
+      return;
+    }
 
-      if (mouseX < px || mouseX > px + 520 || mouseY < py || mouseY > py + 420) {
+    if (timerPanelOpen) {
+      let px = width / 2 - 560 / 2;
+      let py = height / 2 - 430 / 2;
+
+      if (mouseX < px || mouseX > px + 560 || mouseY < py || mouseY > py + 430) {
         closeTimerPanel();
         return;
       }
@@ -86,6 +88,8 @@ function mousePressed() {
 
   } else if (currentPage === "music") {
     handleMusicClick();
+  } else if (currentPage === "dex") {
+    handleDexClick();
   }
 }
 
@@ -95,32 +99,37 @@ function handleCharacterClick() {
   let charSize = min(width, height) * 0.68;
 
   let d = dist(mouseX, mouseY, charX, charY);
+  let pathPos = getCharacterPathPosition();
+  let pathD = dist(mouseX, mouseY, pathPos.x, pathPos.y);
 
-  if (d < charSize * 0.42) {
+  if (d < charSize * 0.42 || pathD < 100) {
     clickEffect = 1.2;
+    openCharacterLogInput();
   }
 }
 
 function handleChecklistClick() {
-  let layout = getTodoLayout();
-
-  let listX = layout.listX;
-  let listY = layout.listY;
-  let boxSize = layout.boxSize;
-  let gap = layout.rowGap;
-
   for (let i = 0; i < todoList.length; i++) {
-    let y = listY + i * gap;
+    let m = getTodoRowMetrics(i);
+    let boxSize = m.layout.boxSize;
 
     if (
-      mouseX > listX &&
-      mouseX < listX + boxSize &&
-      mouseY > y - boxSize / 2 &&
-      mouseY < y + boxSize / 2
+      mouseX > m.checkX - boxSize / 2 &&
+      mouseX < m.checkX + boxSize / 2 &&
+      mouseY > m.y - boxSize / 2 &&
+      mouseY < m.y + boxSize / 2
     ) {
       todoList[i].done = !todoList[i].done;
       clickEffect = 1.15;
+      todoListShake = 8;
       characterAnimating = true;
+
+      if (todoList[i].done) {
+        completionSequence++;
+        todoList[i].completedOrder = completionSequence;
+      } else {
+        todoList[i].completedOrder = null;
+      }
 
       if (todoList[i].timer) {
         let t = todoList[i].timer;
@@ -136,40 +145,176 @@ function handleChecklistClick() {
         finalBurst = 1;
       }
 
+      syncLayeredMusicToProgress();
       saveProgress();
       return;
     }
   }
 }
 
+function openCharacterLogInput() {
+  if (currentPage !== "main") return;
+
+  closeCharacterLogInput();
+
+  characterLogIndex = getCurrentLogPathIndex();
+  let pos = getMainCharacterLogPosition();
+
+  characterLogInput = createInput("");
+  characterLogInput.attribute("placeholder", "탐사 로그 입력");
+  characterLogInput.style("font-size", "14px");
+  characterLogInput.style("padding", "8px 12px");
+  characterLogInput.style("border", "none");
+  characterLogInput.style("border-radius", "8px");
+  characterLogInput.style("background", "rgba(255,255,255,0.96)");
+  characterLogInput.style("color", "#222");
+  characterLogInput.style("outline", "none");
+  characterLogInput.style("font-family", "sans-serif");
+  characterLogInput.style("box-shadow", "0 10px 28px rgba(0,0,0,0.22)");
+  characterLogInput.style("z-index", "30");
+  let groupW = 300;
+  let groupX = constrain(pos.x - groupW / 2, 18, width - groupW - 18);
+  let groupY = constrain(pos.y + min(width, height) * 0.24, 92, height - 92);
+
+  characterLogInput.position(groupX, groupY);
+  characterLogInput.size(220, 36);
+  characterLogInput.mousePressed(function() {
+    characterLogInput.elt.focus();
+  });
+
+  characterLogButton = createButton("LOG");
+  characterLogButton.style("border", "none");
+  characterLogButton.style("border-radius", "8px");
+  characterLogButton.style("background", "rgba(255,255,255,0.96)");
+  characterLogButton.style("color", "#222");
+  characterLogButton.style("font-weight", "700");
+  characterLogButton.style("font-family", "'Share Tech Mono', monospace");
+  characterLogButton.style("box-shadow", "0 10px 28px rgba(0,0,0,0.22)");
+  characterLogButton.style("cursor", "pointer");
+  characterLogButton.style("z-index", "31");
+  characterLogButton.position(groupX + 228, groupY);
+  characterLogButton.size(72, 36);
+  characterLogButton.mousePressed(submitCharacterLog);
+
+  characterLogInput.elt.addEventListener("keydown", function(e) {
+    if (e.key === "Enter") submitCharacterLog();
+  });
+
+  characterLogInput.elt.focus();
+}
+
+function submitCharacterLog() {
+  if (!characterLogInput) return;
+
+  let textValue = characterLogInput.value().trim();
+  if (textValue === "") return;
+
+  characterLogs.push({
+    index: characterLogIndex,
+    text: textValue,
+    createdAt: new Date().toISOString()
+  });
+
+  activeSpeechText = textValue;
+  activeSpeechUntil = millis() + 10000;
+
+  closeCharacterLogInput();
+  saveProgress();
+}
+
+function closeCharacterLogInput() {
+  if (characterLogInput) {
+    characterLogInput.remove();
+    characterLogInput = null;
+  }
+
+  if (characterLogButton) {
+    characterLogButton.remove();
+    characterLogButton = null;
+  }
+}
+
+function isClickOnCharacterLogUI() {
+  if (!characterLogInput && !characterLogButton) return false;
+
+  if (characterLogInput) {
+    let r = characterLogInput.elt.getBoundingClientRect();
+    let x = r.left;
+    let y = r.top;
+    let w = r.width;
+    let h = r.height;
+
+    if (mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h) {
+      return true;
+    }
+  }
+
+  if (characterLogButton) {
+    let r = characterLogButton.elt.getBoundingClientRect();
+    let x = r.left;
+    let y = r.top;
+    let w = r.width;
+    let h = r.height;
+
+    if (mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function getCurrentLogPathIndex() {
+  if (todoList.length <= 0) return 0;
+  return constrain(countDone(), 0, todoList.length - 1);
+}
+
+function getMainCharacterLogPosition() {
+  return {
+    x: width * 0.22,
+    y: height * 0.42
+  };
+}
+
 function handleTimerClicks() {
-  let layout = getTodoLayout();
-
-  let listX = layout.listX;
-  let listY = layout.listY;
-  let listW = layout.listW;
-  let gap = layout.rowGap;
-
-  let timerBoxX = listX + listW + 38;
-  let playX = listX + listW + 100;
-
   for (let i = 0; i < todoList.length; i++) {
-    let y = listY + i * gap;
+    let m = getTodoRowMetrics(i);
 
-    if (dist(mouseX, mouseY, timerBoxX, y) < 16) {
+    if (dist(mouseX, mouseY, m.timerX, m.y) < 20) {
       openTimerPanel(i);
+      return;
+    }
+
+    if (isMouseInRect(m.deleteX - 24, m.y - 17, 48, 34)) {
+      deleteTodoItem(i);
       return;
     }
 
     let t = todoList[i].timer;
 
     if (t.mode === "duration" && !t.running && !t.finished) {
-      if (dist(mouseX, mouseY, playX, y) < 18) {
+      if (dist(mouseX, mouseY, m.playX, m.y) < 20) {
         startTimer(i);
         return;
       }
     }
   }
+}
+
+function deleteTodoItem(index) {
+  if (timerPanelOpen && timerPanelIndex === index) {
+    closeTimerPanel();
+  }
+
+  todoList.splice(index, 1);
+
+  if (timerPanelOpen && timerPanelIndex > index) {
+    timerPanelIndex--;
+  }
+
+  createPathNodes();
+  syncLayeredMusicToProgress();
+  saveProgress();
 }
 
 // ============================================================
@@ -300,8 +445,6 @@ function drawGradientBG(c1, c2) {
       rect(0, y, width, 1);
     }
   }
- 
-  drawSpaceVoyageBackground();
 
   drawStars();
   drawScanLines();
@@ -342,95 +485,6 @@ function drawSystemHud() {
   drawingContext.shadowBlur = 0;
   textFont("sans-serif");
 }
-
-//배경 별 함
-function initSpaceBackground() {
-  spaceLayer = createGraphics(windowWidth, windowHeight, WEBGL);
-  warpStars = [];
-
-  for (let i = 0; i < WARP_STAR_COUNT; i++) {
-    warpStars.push(new WarpStar());
-  }
-
-  spaceBgReady = true;
-}
-
-function drawSpaceVoyageBackground() {
-  if (!spaceBgReady || !spaceLayer) {
-    background(0);
-    return;
-  }
-
-  renderSpaceLayer();
-
-  push();
-  imageMode(CORNER);
-  image(spaceLayer, 0, 0, width, height);
-  pop();
-
-  drawSpaceOverlay2D();
-}
-
-//구 렌더링
-function renderSpaceLayer() {
-  let g = spaceLayer;
-
-  g.background(0);
-
-  g.push();
-  g.translate(-width / 2, -height / 2, 0);
-  drawWarpStarfield(g);
-  g.pop();
-
-  g.ambientLight(70);
-
-  g.directionalLight(
-    245,
-    220,
-    253,
-    -1,
-    -1,
-    -1
-  );
-
-  let lightX = cos(frameCount * 0.01) * 500;
-  let lightZ = sin(frameCount * 0.01) * 500;
-
-  g.pointLight(
-    255,
-    255,
-    255,
-    lightX,
-    0,
-    lightZ
-  );
-
-  g.noStroke();
-
-  g.push();
-  g.translate(lightX, 0, lightZ);
-  g.emissiveMaterial(25, 22, 10);
-  g.sphere(16);
-  g.pop();
-
-  g.push();
-
-  let planetX = width * 0.28;
-  let planetY = height * 0.02;
-
-  g.translate(planetX, planetY, 0);
-  g.rotateY(frameCount * 0.005);
-  g.rotateX(-0.18);
-
-  g.ambientMaterial("#ddffaa");
-  g.sphere(min(width, height) * 0.13, 64, 64);
-
-  g.pop();
-
-  drawSpaceRings3D(g);
-}
-
-
 
 // ============================================================
 // 창 크기 변경 대응
