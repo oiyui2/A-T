@@ -29,6 +29,8 @@ function setup() {
 // ============================================================
 
 function draw() {
+  updateHomeMusicForPage();
+
   if (currentPage === "intro") {
     drawIntroPage();
   } else if (currentPage === "radar") {
@@ -78,13 +80,14 @@ function mousePressed() {
 
       if (mouseX < px || mouseX > px + 560 || mouseY < py || mouseY > py + 430) {
         closeTimerPanel();
+        playValidClickSound();
         return;
       }
     }
 
-    handleCharacterClick();
-    handleChecklistClick();
-    handleTimerClicks();
+    if (handleCharacterClick()) return;
+    if (handleChecklistClick()) return;
+    if (handleTimerClicks()) return;
 
   } else if (currentPage === "music") {
     handleMusicClick();
@@ -105,7 +108,11 @@ function handleCharacterClick() {
   if (d < charSize * 0.42 || pathD < 100) {
     clickEffect = 1.2;
     openCharacterLogInput();
+    playValidClickSound();
+    return true;
   }
+
+  return false;
 }
 
 function handleChecklistClick() {
@@ -147,9 +154,12 @@ function handleChecklistClick() {
 
       syncLayeredMusicToProgress();
       saveProgress();
-      return;
+      playValidClickSound();
+      return true;
     }
   }
+
+  return false;
 }
 
 function openCharacterLogInput() {
@@ -161,7 +171,7 @@ function openCharacterLogInput() {
   let pos = getMainCharacterLogPosition();
 
   characterLogInput = createInput("");
-  characterLogInput.attribute("placeholder", "탐사 로그 입력");
+  characterLogInput.attribute("placeholder", "로그 입력하기");
   characterLogInput.style("font-size", "14px");
   characterLogInput.style("padding", "8px 12px");
   characterLogInput.style("border", "none");
@@ -282,12 +292,14 @@ function handleTimerClicks() {
 
     if (dist(mouseX, mouseY, m.timerX, m.y) < 20) {
       openTimerPanel(i);
-      return;
+      playValidClickSound();
+      return true;
     }
 
     if (isMouseInRect(m.deleteX - 24, m.y - 17, 48, 34)) {
       deleteTodoItem(i);
-      return;
+      playValidClickSound();
+      return true;
     }
 
     let t = todoList[i].timer;
@@ -295,10 +307,13 @@ function handleTimerClicks() {
     if (t.mode === "duration" && !t.running && !t.finished) {
       if (dist(mouseX, mouseY, m.playX, m.y) < 20) {
         startTimer(i);
-        return;
+        playValidClickSound();
+        return true;
       }
     }
   }
+
+  return false;
 }
 
 function deleteTodoItem(index) {
