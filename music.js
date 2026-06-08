@@ -227,9 +227,6 @@ function playSong(index) {
     userStartAudio();
   }
 
-  stopAllSongs();
-  currentSongIndex = index;
-
   let musicSet = layeredMusicSets[index];
 
   if (!musicSet) {
@@ -240,12 +237,22 @@ function playSong(index) {
   ensureLayeredMusicSetLoaded(musicSet);
 
   if (!isLayeredMusicSetLoaded(musicSet)) {
-    console.log("음악 파일 로딩 중입니다. 잠시 후 다시 눌러주세요.");
+    console.log("음악 파일 로딩 중입니다. 잠시 후 자동 재생됩니다.");
+
+    setTimeout(function() {
+      playSong(index);
+    }, 700);
+
     return;
   }
 
+  stopAllSongs();
+
+  currentSongIndex = index;
+
   for (let i = 0; i < musicSet.tracks.length; i++) {
     let track = musicSet.tracks[i];
+
     if (!track) continue;
 
     track.setVolume(0.75);
