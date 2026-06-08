@@ -91,8 +91,7 @@ trackPaths: [
 "sounds/2do2 - 4.subline.wav",
 "sounds/2do2 - 5.choir.wav",
 "sounds/2do2 - 6.noise.wav",
-"sounds/2do2 - 7.beat.wav",
-"sounds/2do2 - 8.wav"
+"sounds/2do2 - 7.beat.wav"
 ]
 },
 {
