@@ -80,6 +80,12 @@ function drawDexRadar() {
     }
 
     image(img, x, y, 90, 90);
+
+    fill(180, 255, 220);
+  textFont("Share Tech Mono");
+  textSize(13);
+  textAlign(CENTER, CENTER);
+  text("UNLOCKED", x, y + 62);
   }
 
   drawUnknownDexDots(cx, cy, r, sweepAngle);
