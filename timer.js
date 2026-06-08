@@ -144,6 +144,7 @@ durationBtn.size(220, 42);
 durationBtn.mousePressed(function() {
 timerMode = "duration";
 updateTabStyle();
+playValidClickSound();
 });
 
 deadlineBtn = createButton("DEADLINE");
@@ -153,6 +154,7 @@ deadlineBtn.size(220, 42);
 deadlineBtn.mousePressed(function() {
 timerMode = "deadline";
 updateTabStyle();
+playValidClickSound();
 });
 
 // 시 / 분 / 초 입력 그룹
@@ -171,6 +173,7 @@ hourMinusBtn.position(hourX - 58, rowY);
 hourMinusBtn.size(38, 42);
 hourMinusBtn.mousePressed(function() {
 adjustTimerValue("hour", -1);
+playValidClickSound();
 });
 
 hourInput = createInput(str(timerHour));
@@ -184,6 +187,7 @@ hourPlusBtn.position(hourX + 62, rowY);
 hourPlusBtn.size(38, 42);
 hourPlusBtn.mousePressed(function() {
 adjustTimerValue("hour", 1);
+playValidClickSound();
 });
 
 // 분
@@ -193,6 +197,7 @@ minMinusBtn.position(minX - 58, rowY);
 minMinusBtn.size(38, 42);
 minMinusBtn.mousePressed(function() {
 adjustTimerValue("min", -5);
+playValidClickSound();
 });
 
 minInput = createInput(str(timerMin));
@@ -206,6 +211,7 @@ minPlusBtn.position(minX + 62, rowY);
 minPlusBtn.size(38, 42);
 minPlusBtn.mousePressed(function() {
 adjustTimerValue("min", 5);
+playValidClickSound();
 });
 
 // 초
@@ -215,6 +221,7 @@ secMinusBtn.position(secX - 58, rowY);
 secMinusBtn.size(38, 42);
 secMinusBtn.mousePressed(function() {
 adjustTimerValue("sec", -10);
+playValidClickSound();
 });
 
 secInput = createInput(str(timerSec));
@@ -228,6 +235,7 @@ secPlusBtn.position(secX + 62, rowY);
 secPlusBtn.size(38, 42);
 secPlusBtn.mousePressed(function() {
 adjustTimerValue("sec", 10);
+playValidClickSound();
 });
 
 // 빠른 설정 버튼
@@ -351,6 +359,7 @@ setTimerDeadline(timerPanelIndex, timerHour, timerMin, timerSec);
 
 closeTimerPanel();
 saveProgress();
+playValidClickSound();
 }
 
 function setTimerDuration(index, totalSec) {
@@ -542,6 +551,7 @@ timerHour = Math.floor(sec / 3600);
 timerMin = Math.floor((sec % 3600) / 60);
 timerSec = Math.floor(sec % 60);
 syncTimerInputs();
+playValidClickSound();
 
 });
 
