@@ -117,10 +117,7 @@ if (typeof userStartAudio === "function") {
 userStartAudio();
 }
 
-// 브라우저 오디오 활성화
-if (typeof userStartAudio === "function") {
-userStartAudio();
-}
+stopLayeredMusic();
 
 // 현재 재생 중인 모든 곡 멈추기
 for (let i = 0; i < songSounds.length; i++) {
@@ -147,5 +144,127 @@ songSounds[i].stop();
 }
 }
 
+stopLayeredMusic();
 currentSongIndex = -1;
+}
+
+// ============================================================
+// 할 일 완료 레이어 음악
+// ============================================================
+
+function selectLayeredMusicForCurrentRun() {
+if (layeredMusicSets.length === 0) return;
+
+stopLayeredMusic();
+currentLayeredMusicSetIndex = inventoryCount % layeredMusicSets.length;
+ensureLayeredMusicSetLoaded(getCurrentLayeredMusicSet());
+layeredMusicActiveCount = 0;
+layeredMusicStarted = false;
+}
+
+function getCurrentLayeredMusicSet() {
+if (layeredMusicSets.length === 0) return null;
+return layeredMusicSets[currentLayeredMusicSetIndex % layeredMusicSets.length];
+}
+
+function startLayeredMusicIfNeeded() {
+if (!musicEnabled) return;
+
+let musicSet = getCurrentLayeredMusicSet();
+if (!musicSet) return;
+ensureLayeredMusicSetLoaded(musicSet);
+if (musicSet.tracks.length === 0) return;
+if (!isLayeredMusicSetLoaded(musicSet)) return;
+
+if (typeof userStartAudio === "function") {
+userStartAudio();
+}
+
+for (let track of musicSet.tracks) {
+if (!track) continue;
+
+if (!track.isPlaying()) {
+track.setVolume(0);
+track.loop(0, 1, 0, 0, musicSet.loopSec);
+}
+}
+
+layeredMusicStarted = true;
+}
+
+function ensureLayeredMusicSetLoaded(musicSet) {
+if (!musicSet || musicSet.tracks.length > 0) return;
+
+for (let path of musicSet.trackPaths || []) {
+musicSet.tracks.push(loadSound(path));
+}
+}
+
+function syncLayeredMusicToProgress() {
+let musicSet = getCurrentLayeredMusicSet();
+if (!musicSet) return;
+ensureLayeredMusicSetLoaded(musicSet);
+if (musicSet.tracks.length === 0) return;
+
+if (!musicEnabled) {
+muteLayeredMusic();
+return;
+}
+
+startLayeredMusicIfNeeded();
+if (!isLayeredMusicSetLoaded(musicSet)) return;
+
+let activeCount = getUnlockedLayerCount(musicSet.tracks.length);
+layeredMusicActiveCount = activeCount;
+
+for (let i = 0; i < musicSet.tracks.length; i++) {
+let track = musicSet.tracks[i];
+if (!track) continue;
+
+let targetVolume = i < activeCount ? 0.75 : 0;
+track.setVolume(targetVolume, 0.25);
+}
+}
+
+function isLayeredMusicSetLoaded(musicSet) {
+for (let track of musicSet.tracks) {
+if (!track) return false;
+if (track.isLoaded && !track.isLoaded()) return false;
+}
+
+return true;
+}
+
+function getUnlockedLayerCount(trackCount) {
+if (todoList.length <= 0 || trackCount <= 0) return 0;
+
+let doneCount = countDone();
+if (doneCount <= 0) return 0;
+if (doneCount >= todoList.length) return trackCount;
+
+return constrain(ceil((doneCount / todoList.length) * trackCount), 1, trackCount);
+}
+
+function muteLayeredMusic() {
+let musicSet = getCurrentLayeredMusicSet();
+if (!musicSet) return;
+
+for (let track of musicSet.tracks) {
+if (track) {
+track.setVolume(0, 0.15);
+}
+}
+}
+
+function stopLayeredMusic() {
+for (let musicSet of layeredMusicSets) {
+for (let track of musicSet.tracks) {
+if (track && track.isPlaying()) {
+track.stop();
+}
+}
+}
+
+layeredMusicStarted = false;
+layeredMusicActiveCount = 0;
 }
