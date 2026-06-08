@@ -39,6 +39,9 @@ let layeredMusicSets = [];
 let currentLayeredMusicSetIndex = 0;
 let layeredMusicStarted = false;
 let layeredMusicActiveCount = 0;
+let homeMusicSound;
+let clickSound;
+let extraSoundAssets = [];
 
 // 할 일 관련
 let todoList = [];
