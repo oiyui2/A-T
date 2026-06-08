@@ -47,15 +47,15 @@ function buildMainPageUI() {
 }
 
 function buildResultPageUI() {
-  saveImageButton = createButton("▣ 결과 이미지 저장");
+  saveImageButton = createButton("결과 이미지 저장");
   styleSciButton(saveImageButton, "#ff5fa2");
   saveImageButton.mousePressed(downloadResultImage);
 
-  musicPageButton = createButton("▣ 곡 플레이 화면");
+  musicPageButton = createButton("곡 플레이 화면");
   styleSciButton(musicPageButton, "#b47cff");
   musicPageButton.mousePressed(goToMusicPage);
 
-  restartButton = createButton("▣ 새 할 일 시작");
+  restartButton = createButton("새 할 일 시작");
   styleSciButton(restartButton, "#7ea0ff");
   restartButton.mousePressed(restartProgram);
 }
@@ -377,16 +377,21 @@ function positionUI() {
   }
 
   if (currentPage === "result") {
-    saveImageButton.size(180, 54);
-    musicPageButton.size(180, 54);
-    restartButton.size(180, 54);
-    resetAllButton.size(200, 54);
+    saveImageButton.size(210, 54);
+    musicPageButton.size(210, 54);
+    restartButton.size(210, 54);
+    resetAllButton.size(210, 54);
 
-    saveImageButton.position(width / 2 - 390, height * 0.90);
-    musicPageButton.position(width / 2 - 195, height * 0.90);
-    restartButton.position(width / 2, height * 0.90);
-    resetAllButton.position(width / 2 + 195, height * 0.90);
-  }
+    let gap = 18;
+    let totalW = 210 * 4 + gap * 3;
+    let startX = width / 2 - totalW / 2;
+    let y = height * 0.90;
+
+    saveImageButton.position(startX, y);
+    musicPageButton.position(startX + (210 + gap), y);
+    restartButton.position(startX + (210 + gap) * 2, y);
+    resetAllButton.position(startX + (210 + gap) * 3, y);
+}
 
  if (currentPage === "music") {
   musicToggleBtn.size(170, 54);
