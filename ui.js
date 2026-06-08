@@ -41,8 +41,8 @@ function buildInputPageUI() {
 }
 
 function buildMainPageUI() {
-  resultButton = createButton("오늘 결과 보기");
-  styleButton(resultButton, "#e8578a");
+  resultButton = createButton("RESULT LOG");
+  styleSciButton(resultButton, "#ff6fae");
   resultButton.mousePressed(goToResultPage);
 }
 
@@ -80,6 +80,7 @@ function toggleMusicEnabled() {
   if (musicEnabled) {
     musicToggleBtn.html("🔊 곡 재생: 켜짐");
     musicToggleBtn.style("background", "#5cb85c");
+    syncLayeredMusicToProgress();
   } else {
     musicToggleBtn.html("🔇 곡 재생: 꺼짐");
     musicToggleBtn.style("background", "#999");
@@ -137,13 +138,18 @@ function navToTodo() {
   if (pathNodes.length === 0) {
     if (!loadedFromSave) selectedCharacterIndex = floor(random(characters.length));
     rewardClaimed = false;
+    characterLogs = [];
+    activeSpeechText = "";
+    completionSequence = 0;
     finalBurst = 0;
     characterAnimating = true;
+    selectLayeredMusicForCurrentRun();
     createPathNodes();
   }
 
   currentPage = "main";
   showOnlyMainUI();
+  syncLayeredMusicToProgress();
   saveProgress();
 }
 
@@ -274,6 +280,7 @@ function hideAllUI() {
   if (stopMusicButton) stopMusicButton.hide();
   if (musicToggleBtn) musicToggleBtn.hide();
 
+  closeCharacterLogInput();
   closeTimerPanelDOM();
   timerPanelOpen = false;
   timerPanelIndex = -1;
@@ -364,7 +371,9 @@ function positionUI() {
   }
 
   if (currentPage === "main") {
-    resultButton.position(width - 190, height - 80);
+    let layout = getTodoLayout();
+    resultButton.size(142, 38);
+    resultButton.position(layout.listX + layout.listW - 164, layout.listY - 68);
   }
 
   if (currentPage === "result") {
@@ -528,6 +537,7 @@ function addTodo() {
   todoList.push({
     title: textValue,
     done: false,
+    completedOrder: null,
     timer: {
       mode: null,
       totalSec: 0,
@@ -558,12 +568,17 @@ function goToMainPage() {
   }
 
   rewardClaimed = false;
+  characterLogs = [];
+  activeSpeechText = "";
+  completionSequence = 0;
+  selectLayeredMusicForCurrentRun();
   currentPage = "main";
   characterAnimating = true;
   finalBurst = 0;
 
   createPathNodes();
   showOnlyMainUI();
+  syncLayeredMusicToProgress();
 
   saveProgress();
 }
@@ -577,9 +592,13 @@ function drawMainPage() {
 
   updateTimers();
   updateFinalBurstState();
+  if (frameCount % 30 === 0) {
+    syncLayeredMusicToProgress();
+  }
 
   drawTopGuideLine();
   drawMainCharacter();
+  drawCharacterSpeechBubble();
   drawTodoPanel();
   drawGrowthPath();
   drawMovingCharacterOnPath();
@@ -652,20 +671,49 @@ function drawMainCharacter() {
 // ============================================================
 
 function getTodoLayout() {
-  let listX = width * 0.58;
-  let listY = height * 0.30;
-  let listW = width * 0.23;
+  let listX = width * 0.50;
+  let listY = height * 0.32;
+  let listW = min(width * 0.44, 640);
+  let rowH = 54;
 
-  let rowGap = min(70, (height * 0.48) / max(todoList.length - 1, 1));
-  rowGap = max(rowGap, 52);
+  let rowGap = min(68, (height * 0.44) / max(todoList.length - 1, 1));
+  rowGap = max(rowGap, rowH + 6);
 
   return {
     listX: listX,
     listY: listY,
     listW: listW,
+    rowH: rowH,
     rowGap: rowGap,
     boxSize: 24
   };
+}
+
+function getTodoRowMetrics(index) {
+  let layout = getTodoLayout();
+  let rowX = layout.listX;
+  let rowY = layout.listY + index * layout.rowGap;
+  let rowW = layout.listW;
+  let rowH = layout.rowH;
+  let hover = isMouseInRect(rowX, rowY - rowH / 2, rowW, rowH);
+
+  return {
+    layout: layout,
+    x: rowX,
+    y: rowY,
+    w: rowW,
+    h: rowH,
+    hover: hover,
+    scaleAmount: hover ? 1.025 : 1,
+    checkX: rowX + 30,
+    timerX: rowX + rowW - 128,
+    playX: rowX + rowW - 82,
+    deleteX: rowX + rowW - 36
+  };
+}
+
+function isMouseInRect(x, y, w, h) {
+  return mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h;
 }
 
 function drawTodoPanel() {
@@ -674,58 +722,170 @@ function drawTodoPanel() {
   let listX = layout.listX;
   let listY = layout.listY;
   let listW = layout.listW;
-  let rowGap = layout.rowGap;
-  let boxSize = layout.boxSize;
+
+  drawTodoHeader(listX, listY, listW);
 
   fill(255);
   noStroke();
   textAlign(LEFT, CENTER);
-  textSize(30);
-  text("할 일 리스트", listX, listY - 105);
 
-  fill(220, 210, 255);
-  textSize(18);
-  text(countDone() + " / " + todoList.length + " 완료", listX, listY - 65);
+  todoListShake = lerp(todoListShake, 0, 0.16);
+  let shakeOffset = todoListShake > 0.05 ? sin(frameCount * 1.7) * todoListShake : 0;
 
   for (let i = 0; i < todoList.length; i++) {
-    let y = listY + i * rowGap;
     let todo = todoList[i];
+    let m = getTodoRowMetrics(i);
+    let t = todo.timer;
+
+    push();
+    translate(m.x + m.w / 2 + shakeOffset, m.y);
+    scale(m.scaleAmount);
+    translate(-m.w / 2, -m.h / 2);
+
+    drawingContext.shadowBlur = m.hover ? 20 : 8;
+    drawingContext.shadowColor = m.hover ? "#d7ccff" : "#7860b0";
+
+    noStroke();
+    fill(todo.done ? color(14, 48, 52, 226) : color(18, 18, 44, 226));
+    rect(0, 0, m.w, m.h, 6);
+
+    noFill();
+    stroke(todo.done ? color(95, 255, 224, 220) : color(150, 145, 220, 150));
+    strokeWeight(1.4);
+    rect(0, 0, m.w, m.h, 6);
+
+    stroke(95, 255, 224, m.hover ? 170 : 70);
+    strokeWeight(1);
+    line(14, 9, 64, 9);
+    line(m.w - 14, m.h - 9, m.w - 64, m.h - 9);
+
+    drawingContext.shadowBlur = 0;
+
+    noStroke();
+    fill(95, 255, 224, 18);
+    rect(0, 0, 8, m.h, 6);
 
     stroke(230);
     strokeWeight(1.5);
-    fill(255);
-    rect(listX, y - boxSize / 2, boxSize, boxSize);
+    fill(todo.done ? color(120, 255, 170) : color(255));
+    rect(18, m.h / 2 - layout.boxSize / 2, layout.boxSize, layout.boxSize, 5);
 
     if (todo.done) {
-      stroke(120, 255, 170);
+      stroke(20, 55, 45);
       strokeWeight(3);
-      line(listX + 5, y, listX + 11, y + 7);
-      line(listX + 11, y + 7, listX + 20, y - 7);
+      line(23, m.h / 2, 29, m.h / 2 + 7);
+      line(29, m.h / 2 + 7, 38, m.h / 2 - 7);
     }
-
-    stroke(220, 210, 255, 160);
-    strokeWeight(1);
-    line(listX + 42, y, listX + listW, y);
 
     noStroke();
     fill(todo.done ? color(170, 220, 180) : color(255));
-    textSize(20);
-    text(todo.title, listX + 48, y - 18);
+    textAlign(LEFT, CENTER);
+    textFont("Share Tech Mono");
+    textSize(18);
+    text(trimTodoTitle(todo.title, m.w), 58, m.h / 2);
+    textFont("sans-serif");
 
-    drawTimerBox(i, listX + listW + 38, y);
+    drawTimerBox(i, m.w - 128, m.h / 2);
 
-    let t = todo.timer;
-
-    if (t.mode !== null && t.totalSec > 0) {
+    if (t && t.mode !== null && t.totalSec > 0) {
       if (t.running || t.finished || t.expired) {
-        drawTimerRing(i, listX + listW + 100, y);
+        drawTimerRing(i, m.w - 82, m.h / 2);
       } else if (t.mode === "duration") {
-        drawPlayButton(i, listX + listW + 100, y);
+        drawPlayButton(i, m.w - 82, m.h / 2);
       }
     }
+
+    drawTodoDeleteButton(m.w - 36, m.h / 2);
+
+    pop();
   }
 
   textAlign(CENTER, CENTER);
+}
+
+function trimTodoTitle(title, rowW) {
+  let maxChars = rowW < 560 ? 18 : 24;
+  if (title.length <= maxChars) return title;
+  return title.substring(0, maxChars - 1) + "...";
+}
+
+function drawTodoHeader(x, y, w) {
+  let doneCount = countDone();
+  let totalCount = max(todoList.length, 1);
+  let percent = floor((doneCount / totalCount) * 100);
+  let panelH = 96;
+  let panelY = y - 132;
+  let segments = 24;
+  let filledSegments = floor((percent / 100) * segments);
+
+  drawingContext.shadowBlur = 20;
+  drawingContext.shadowColor = "#5fffe0";
+
+  noStroke();
+  fill(4, 18, 28, 210);
+  rect(x, panelY, w, panelH, 6);
+
+  noFill();
+  stroke(95, 255, 224, 160);
+  strokeWeight(1.3);
+  rect(x, panelY, w, panelH, 6);
+
+  drawingContext.shadowBlur = 0;
+
+  stroke(95, 255, 224, 140);
+  strokeWeight(1);
+  line(x + 18, panelY + 16, x + 88, panelY + 16);
+  line(x + w - 18, panelY + panelH - 16, x + w - 88, panelY + panelH - 16);
+
+  textFont("Orbitron");
+  textAlign(LEFT, CENTER);
+  textStyle(BOLD);
+  fill(235, 255, 252);
+  textSize(25);
+  text("MISSION LIST", x + 22, panelY + 30);
+
+  textFont("Share Tech Mono");
+  textStyle(NORMAL);
+  fill(170, 255, 240);
+  textSize(15);
+  text(doneCount + " / " + todoList.length + " COMPLETE", x + 24, panelY + 60);
+
+  textAlign(RIGHT, CENTER);
+  fill(255);
+  textSize(30);
+  text(percent + "%", x + w - 24, panelY + 32);
+
+  let barX = x + 24;
+  let barY = panelY + 76;
+  let barW = w - 210;
+  let segW = (barW - (segments - 1) * 4) / segments;
+
+  for (let i = 0; i < segments; i++) {
+    let active = i < filledSegments;
+    noStroke();
+    fill(active ? color(95, 255, 224, 230) : color(90, 90, 125, 110));
+    rect(barX + i * (segW + 4), barY, segW, 8, 2);
+  }
+
+  textFont("sans-serif");
+  textStyle(NORMAL);
+  textAlign(CENTER, CENTER);
+}
+
+function drawTodoDeleteButton(x, y) {
+  let c = color(255, 118, 150);
+  stroke(c);
+  strokeWeight(1.7);
+  line(x - 8, y - 11, x + 8, y + 5);
+  line(x + 8, y - 11, x - 8, y + 5);
+
+  noStroke();
+  fill(255, 210, 220);
+  textAlign(CENTER, CENTER);
+  textFont("Share Tech Mono");
+  textSize(10);
+  text("DEL", x, y + 12);
+  textFont("sans-serif");
 }
 
 // ============================================================
@@ -779,7 +939,79 @@ function drawGrowthPath() {
     fill(220, 210, 255);
     textSize(12);
     text(i + 1, p.x, p.y + 24);
+
+    drawPathLogHover(i, p.x, p.y);
   }
+}
+
+function drawCharacterSpeechBubble() {
+  if (activeSpeechText === "" || millis() > activeSpeechUntil) return;
+
+  let pos = getMainCharacterLogPosition();
+  let bubbleW = min(360, max(180, activeSpeechText.length * 13));
+  let bubbleH = 54;
+  let x = constrain(pos.x - bubbleW / 2, 20, width - bubbleW - 20);
+  let y = pos.y - min(width, height) * 0.22;
+
+  noStroke();
+  fill(255, 255, 255, 245);
+  rect(x, y, bubbleW, bubbleH, 10);
+  triangle(pos.x - 10, y + bubbleH, pos.x + 10, y + bubbleH, pos.x, y + bubbleH + 14);
+
+  noStroke();
+  fill(35);
+  textFont("sans-serif");
+  textSize(15);
+  textAlign(CENTER, CENTER);
+  text(activeSpeechText, x + bubbleW / 2, y + bubbleH / 2);
+}
+
+function drawPathLogHover(index, x, y) {
+  if (dist(mouseX, mouseY, x, y) > 20) return;
+
+  let logs = getLogsForPathIndex(index);
+  if (logs.length === 0) return;
+
+  let visibleLogs = logs.slice(max(0, logs.length - 4));
+  let longest = "";
+  for (let log of visibleLogs) {
+    if (log.text.length > longest.length) longest = log.text;
+  }
+
+  let boxW = min(440, max(210, longest.length * 11));
+  let boxH = 28 + visibleLogs.length * 22;
+  let boxX = constrain(x - boxW / 2, 20, width - boxW - 20);
+  let boxY = max(90, y - boxH - 36);
+
+  noStroke();
+  fill(255, 255, 255, 245);
+  rect(boxX, boxY, boxW, boxH, 10);
+  triangle(x - 8, boxY + boxH, x + 8, boxY + boxH, x, boxY + boxH + 12);
+
+  noStroke();
+  fill(35);
+  textFont("sans-serif");
+  textSize(14);
+  textAlign(LEFT, CENTER);
+
+  for (let i = 0; i < visibleLogs.length; i++) {
+    fill(i % 2 === 0 ? color(35) : color(95, 80, 145));
+    text(visibleLogs[i].text, boxX + 18, boxY + 20 + i * 22);
+  }
+
+  textAlign(CENTER, CENTER);
+}
+
+function getLogsForPathIndex(index) {
+  let logs = [];
+
+  for (let log of characterLogs) {
+    if (log.index === index) {
+      logs.push(log);
+    }
+  }
+
+  return logs;
 }
 
 function drawMovingCharacterOnPath() {
@@ -865,6 +1097,7 @@ function goToResultPage() {
     todoList.length > 0 &&
     rewardClaimed === false
   ) {
+    explorationRecords.push(createExplorationRecord());
     inventoryCount++;
     rewardClaimed = true;
     saveInventory();
@@ -872,6 +1105,32 @@ function goToResultPage() {
 
   showOnlyResultUI();
   saveProgress();
+}
+
+function createExplorationRecord() {
+  let orderedTodos = [];
+
+  for (let i = 0; i < todoList.length; i++) {
+    orderedTodos.push({
+      title: todoList[i].title,
+      done: todoList[i].done,
+      completedOrder: todoList[i].completedOrder || i + 1,
+      index: i
+    });
+  }
+
+  orderedTodos.sort(function(a, b) {
+    return a.completedOrder - b.completedOrder;
+  });
+
+  return {
+    acquiredAt: new Date().toISOString(),
+    characterIndex: selectedCharacterIndex,
+    musicSetIndex: currentLayeredMusicSetIndex,
+    todos: orderedTodos,
+    logs: characterLogs.slice(),
+    completionRate: todoList.length > 0 ? floor((countDone() / todoList.length) * 100) : 0
+  };
 }
 
 function drawResultPage() {
