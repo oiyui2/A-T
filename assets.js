@@ -36,6 +36,7 @@ loadImage("images/5단계구.png")
 ];
 
 loadLayeredMusicSets();
+loadExtraSoundAssets();
 
 for (let set of layeredMusicSets) {
   ensureLayeredMusicSetLoaded(set);
@@ -45,6 +46,18 @@ for (let set of layeredMusicSets) {
 
 function loadSongSounds() {
 songSounds[0] = loadSound("sounds/2do3-BigRideEdit_140_SnareSplash_FX_4bars.wav");
+}
+
+function loadExtraSoundAssets() {
+homeMusicSound = loadSound("sounds/Untitled_2026_6_9__1206.mp3");
+clickSound = loadSound("sounds/ksjsbwuil-digital-click-3-513897.mp3");
+
+extraSoundAssets = [
+loadSound("sounds/song1.mp3"),
+loadSound("sounds/back_drop-dark-ambient-liminal-background-music-subliminal-voices-197604%20%281%29.mp3"),
+loadSound("sounds/%EC%84%B1%EC%9A%B4%EC%9D%98%20%EC%88%A8%EA%B2%B0.mp3"),
+loadSound("sounds/%EC%84%B1%EC%9A%B4%EC%9D%98%20%EC%88%A8%EA%B2%B0%20%281%29.mp3")
+];
 }
 
 function loadLayeredMusicSets() {
@@ -96,6 +109,30 @@ trackPaths: [
 "sounds/2do3- MAB_80_C%23min_ReverseKey_03_1bar.wav",
 "sounds/2do3- Voice_Audio 3.wav",
 "sounds/2do3- Voice_Audio 4.wav"
+]
+},
+{
+name: "\ubc24\ubc14\ub2e4 \ub4dc\ub7fc",
+tracks: [
+],
+trackPaths: [
+"sounds/back_drop-dark-ambient-liminal-background-music-subliminal-voices-197604%20%281%29.mp3"
+]
+},
+{
+name: "\ub9c8\uc9c0\ub9c9 \ud589\uc131\uc758 \ub178\ub798",
+tracks: [
+],
+trackPaths: [
+"sounds/%EC%84%B1%EC%9A%B4%EC%9D%98%20%EC%88%A8%EA%B2%B0.mp3"
+]
+},
+{
+name: "\uc228\uaca8\uc9c4 \uba5c\ub85c\ub514",
+tracks: [
+],
+trackPaths: [
+"sounds/%EC%84%B1%EC%9A%B4%EC%9D%98%20%EC%88%A8%EA%B2%B0%20%281%29.mp3"
 ]
 }
 ];
