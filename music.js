@@ -2,150 +2,256 @@
 // ============================================================
 
 function goToMusicPage() {
-currentPage = "music";
-showOnlyMusicUI();
+  currentPage = "music";
+  showOnlyMusicUI();
 }
 
 function goBackToResultPage() {
-stopAllSongs();
+  stopAllSongs();
 
-currentPage = "result";
-showOnlyResultUI();
+  currentPage = "result";
+  showOnlyResultUI();
 }
-
 
 // ============================================================
 // 음악 화면
 // ============================================================
 
 function drawMusicPage() {
-drawGradientBG(color(20, 10, 50), color(60, 20, 80));
+  drawGradientBG(color(0, 5, 12), color(0, 20, 25));
 
-fill(255);
-textStyle(BOLD);
-textSize(min(width, height) * 0.06);
-text("Song", width * 0.12, height * 0.10);
+  textAlign(CENTER, CENTER);
 
-textSize(24);
-text("곡 이름", width * 0.28, height * 0.17);
-text("필요 캐릭터 개수", width * 0.68, height * 0.17);
+  drawingContext.shadowBlur = 22;
+  drawingContext.shadowColor = "#5fffe0";
 
-textStyle(NORMAL);
-fill(220, 210, 255);
-textSize(20);
-text("보유한 캐릭터 개수: " + inventoryCount + "개", width * 0.78, height * 0.10);
+  textFont("Orbitron");
+  textStyle(BOLD);
+  fill(95, 255, 224);
+  textSize(min(width, height) * 0.052);
+  text("SPACE SIGNAL ARCHIVE", width / 2, height * 0.13);
 
-for (let i = 0; i < songs.length; i++) {
-drawSongRow(i);
+  drawingContext.shadowBlur = 0;
+
+  textStyle(NORMAL);
+  textFont("Share Tech Mono");
+  fill(190, 255, 245);
+  textSize(18);
+  text("ENTITY COLLECTION UNLOCKS ADDITIONAL SIGNALS", width / 2, height * 0.20);
+
+  fill(220, 210, 255);
+  textSize(18);
+  text("COLLECTED ENTITIES : " + inventoryCount, width / 2, height * 0.25);
+
+  drawSignalPanel();
+
+  for (let i = 0; i < songs.length; i++) {
+    drawSongRow(i);
+  }
+
+  textFont("sans-serif");
+  textStyle(NORMAL);
 }
 
-fill(220, 210, 255);
-textSize(15);
-text("캐릭터를 모을수록 더 많은 곡을 플레이할 수 있습니다.", width / 2, height - 35);
+function drawSignalPanel() {
+  let panelX = width * 0.04;
+  let panelY = height * 0.30;
+  let panelW = width * 0.92;
+  let panelH = height * 0.50;
+
+  drawingContext.shadowBlur = 18;
+  drawingContext.shadowColor = "#5fffe0";
+
+  noStroke();
+  fill(0, 18, 22, 150);
+  rect(panelX, panelY, panelW, panelH, 10);
+
+  noFill();
+  stroke(95, 255, 224, 160);
+  strokeWeight(1.5);
+  rect(panelX, panelY, panelW, panelH, 10);
+
+  // 모서리 장식
+  stroke(95, 255, 224, 220);
+  strokeWeight(2);
+
+  line(panelX + 18, panelY + 18, panelX + 90, panelY + 18);
+  line(panelX + 18, panelY + 18, panelX + 18, panelY + 80);
+
+  line(panelX + panelW - 18, panelY + 18, panelX + panelW - 90, panelY + 18);
+  line(panelX + panelW - 18, panelY + 18, panelX + panelW - 18, panelY + 80);
+
+  line(panelX + 18, panelY + panelH - 18, panelX + 90, panelY + panelH - 18);
+  line(panelX + 18, panelY + panelH - 18, panelX + 18, panelY + panelH - 80);
+
+  line(panelX + panelW - 18, panelY + panelH - 18, panelX + panelW - 90, panelY + panelH - 18);
+  line(panelX + panelW - 18, panelY + panelH - 18, panelX + panelW - 18, panelY + panelH - 80);
+
+  drawingContext.shadowBlur = 0;
+
+  textFont("Share Tech Mono");
+  textAlign(LEFT, CENTER);
+  fill(95, 255, 224);
+  textSize(18);
+  text("SIGNAL NAME", panelX + 70, panelY + 48);
+
+  textAlign(CENTER, CENTER);
+  text("REQUIRED ENTITY", panelX + panelW * 0.62, panelY + 48);
+
+  textAlign(RIGHT, CENTER);
+  text("STATUS", panelX + panelW - 80, panelY + 48);
+
+  stroke(95, 255, 224, 80);
+  strokeWeight(1);
+  line(panelX + 55, panelY + 75, panelX + panelW - 55, panelY + 75);
 }
 
 function drawSongRow(i) {
-let y = height * 0.26 + i * 64;
-let song = songs[i];
-let canPlay = inventoryCount >= song.need;
+  let panelX = width * 0.04;
+  let panelY = height * 0.30;
+  let panelW = width * 0.92;
 
-noStroke();
+  let rowX = panelX + 55;
+  let rowW = panelW - 110;
+  let rowH = 52;
+  let y = panelY + 112 + i * 62;
 
-if (canPlay) {
-fill(190, 180, 215, 220);
-} else {
-fill(120, 115, 140, 170);
-}
+  let song = songs[i];
+  let canPlay = inventoryCount >= song.need;
+  let isPlaying = currentSongIndex === i;
 
-rect(width * 0.08, y - 22, width * 0.80, 44, 22);
+  let hover = mouseX > rowX && mouseX < rowX + rowW && mouseY > y - rowH / 2 && mouseY < y + rowH / 2;
 
-fill(255);
-triangle(width * 0.11, y - 10, width * 0.11, y + 10, width * 0.125, y);
+  drawingContext.shadowBlur = hover || isPlaying ? 20 : 8;
+  drawingContext.shadowColor = isPlaying ? "#5fffe0" : "#5fffe0";
 
-textAlign(LEFT, CENTER);
-textSize(20);
-fill(255);
-text(song.title, width * 0.18, y);
+  noStroke();
 
-textAlign(CENTER, CENTER);
-text(song.need + "개", width * 0.68, y);
+  if (isPlaying) {
+    fill(0, 80, 72, 210);
+  } else if (canPlay) {
+    fill(0, 30, 36, 190);
+  } else {
+    fill(25, 25, 35, 165);
+  }
 
-if (!canPlay) {
-fill(255, 180, 200);
-textSize(16);
-text("잠김", width * 0.82, y);
-} else if (currentSongIndex === i) {
-fill(180, 255, 200);
-textSize(16);
-text("Now playing ...", width * 0.82, y);
-}
+  rect(rowX, y - rowH / 2, rowW, rowH, 6);
 
-textAlign(CENTER, CENTER);
+  noFill();
+  stroke(canPlay ? color(95, 255, 224, 170) : color(120, 120, 150, 120));
+  strokeWeight(1.3);
+  rect(rowX, y - rowH / 2, rowW, rowH, 6);
+
+  drawingContext.shadowBlur = 0;
+
+  // 신호 아이콘
+  textFont("Share Tech Mono");
+  textAlign(CENTER, CENTER);
+  textSize(16);
+
+  if (canPlay) {
+    fill(95, 255, 224);
+    text("▶", rowX + 36, y);
+  } else {
+    fill(160, 160, 180);
+    text("■", rowX + 36, y);
+  }
+
+  // 신호 번호 + 곡 이름
+  textAlign(LEFT, CENTER);
+  textSize(18);
+  fill(canPlay ? color(235, 255, 252) : color(160, 160, 180));
+  text("[ SIGNAL " + nf(i + 1, 2) + " ]  " + song.title, rowX + 75, y);
+
+  // 필요 캐릭터
+  textAlign(CENTER, CENTER);
+  fill(canPlay ? color(190, 255, 245) : color(150, 150, 170));
+  text(song.need + " ENTITY", panelX + panelW * 0.62, y);
+
+  // 상태
+  textAlign(RIGHT, CENTER);
+  if (!canPlay) {
+    fill(255, 120, 160);
+    text("ACCESS DENIED", panelX + panelW - 80, y);
+  } else if (isPlaying) {
+    fill(150, 255, 190);
+    text("SIGNAL RECEIVING", panelX + panelW - 80, y);
+  } else {
+    fill(95, 255, 224);
+    text("READY", panelX + panelW - 80, y);
+  }
+
+  textAlign(CENTER, CENTER);
+  textFont("sans-serif");
 }
 
 function handleMusicClick() {
-for (let i = 0; i < songs.length; i++) {
-let y = height * 0.26 + i * 64;
-let song = songs[i];
+  let panelX = width * 0.04;
+  let panelY = height * 0.30;
+  let panelW = width * 0.92;
 
-let inside =
-mouseX > width * 0.08 &&
-mouseX < width * 0.88 &&
-mouseY > y - 22 &&
-mouseY < y + 22;
+  let rowX = panelX + 55;
+  let rowW = panelW - 110;
+  let rowH = 52;
 
-if (inside) {
-// 잠긴 곡이면 클릭해도 재생 안 됨
-if (inventoryCount < song.need) {
-console.log("아직 잠긴 곡입니다.");
-return;
-}
+  for (let i = 0; i < songs.length; i++) {
+    let y = panelY + 112 + i * 62;
+    let song = songs[i];
 
-playSong(i);
-return;
-}
-}
+    let inside =
+      mouseX > rowX &&
+      mouseX < rowX + rowW &&
+      mouseY > y - rowH / 2 &&
+      mouseY < y + rowH / 2;
+
+    if (inside) {
+      if (inventoryCount < song.need) {
+        console.log("아직 잠긴 곡입니다.");
+        return;
+      }
+
+      playSong(i);
+      return;
+    }
+  }
 }
 
 function playSong(index) {
-if (!musicEnabled) {
-console.log("곡 재생이 꺼져 있습니다. (상단/하단 토글로 켜기)");
-return;
-}
+  if (!musicEnabled) {
+    console.log("곡 재생이 꺼져 있습니다. (상단/하단 토글로 켜기)");
+    return;
+  }
 
-if (typeof userStartAudio === "function") {
-userStartAudio();
-}
+  if (typeof userStartAudio === "function") {
+    userStartAudio();
+  }
 
-stopLayeredMusic();
+  stopLayeredMusic();
 
-// 현재 재생 중인 모든 곡 멈추기
-for (let i = 0; i < songSounds.length; i++) {
-if (songSounds[i] && songSounds[i].isPlaying()) {
-songSounds[i].stop();
-}
-}
+  for (let i = 0; i < songSounds.length; i++) {
+    if (songSounds[i] && songSounds[i].isPlaying()) {
+      songSounds[i].stop();
+    }
+  }
 
-// 음악 파일이 없어도 선택 상태는 바뀌게 함
-currentSongIndex = index;
+  currentSongIndex = index;
 
-// 음악 파일이 있으면 재생
-if (songSounds[index]) {
-songSounds[index].play();
-} else {
-console.log("음악 파일이 아직 없습니다. 표시만 변경합니다.");
-}
+  if (songSounds[index]) {
+    songSounds[index].play();
+  } else {
+    console.log("음악 파일이 아직 없습니다. 표시만 변경합니다.");
+  }
 }
 
 function stopAllSongs() {
-for (let i = 0; i < songSounds.length; i++) {
-if (songSounds[i] && songSounds[i].isPlaying()) {
-songSounds[i].stop();
-}
-}
+  for (let i = 0; i < songSounds.length; i++) {
+    if (songSounds[i] && songSounds[i].isPlaying()) {
+      songSounds[i].stop();
+    }
+  }
 
-stopLayeredMusic();
-currentSongIndex = -1;
+  stopLayeredMusic();
+  currentSongIndex = -1;
 }
 
 // ============================================================
@@ -153,118 +259,118 @@ currentSongIndex = -1;
 // ============================================================
 
 function selectLayeredMusicForCurrentRun() {
-if (layeredMusicSets.length === 0) return;
+  if (layeredMusicSets.length === 0) return;
 
-stopLayeredMusic();
-currentLayeredMusicSetIndex = inventoryCount % layeredMusicSets.length;
-ensureLayeredMusicSetLoaded(getCurrentLayeredMusicSet());
-layeredMusicActiveCount = 0;
-layeredMusicStarted = false;
+  stopLayeredMusic();
+  currentLayeredMusicSetIndex = inventoryCount % layeredMusicSets.length;
+  ensureLayeredMusicSetLoaded(getCurrentLayeredMusicSet());
+  layeredMusicActiveCount = 0;
+  layeredMusicStarted = false;
 }
 
 function getCurrentLayeredMusicSet() {
-if (layeredMusicSets.length === 0) return null;
-return layeredMusicSets[currentLayeredMusicSetIndex % layeredMusicSets.length];
+  if (layeredMusicSets.length === 0) return null;
+  return layeredMusicSets[currentLayeredMusicSetIndex % layeredMusicSets.length];
 }
 
 function startLayeredMusicIfNeeded() {
-if (!musicEnabled) return;
+  if (!musicEnabled) return;
 
-let musicSet = getCurrentLayeredMusicSet();
-if (!musicSet) return;
-ensureLayeredMusicSetLoaded(musicSet);
-if (musicSet.tracks.length === 0) return;
-if (!isLayeredMusicSetLoaded(musicSet)) return;
+  let musicSet = getCurrentLayeredMusicSet();
+  if (!musicSet) return;
+  ensureLayeredMusicSetLoaded(musicSet);
+  if (musicSet.tracks.length === 0) return;
+  if (!isLayeredMusicSetLoaded(musicSet)) return;
 
-if (typeof userStartAudio === "function") {
-userStartAudio();
-}
+  if (typeof userStartAudio === "function") {
+    userStartAudio();
+  }
 
-for (let track of musicSet.tracks) {
-if (!track) continue;
+  for (let track of musicSet.tracks) {
+    if (!track) continue;
 
-if (!track.isPlaying()) {
-track.setVolume(0);
-track.loop(0, 1, 0, 0, musicSet.loopSec);
-}
-}
+    if (!track.isPlaying()) {
+      track.setVolume(0);
+      track.loop(0, 1, 0, 0, musicSet.loopSec);
+    }
+  }
 
-layeredMusicStarted = true;
+  layeredMusicStarted = true;
 }
 
 function ensureLayeredMusicSetLoaded(musicSet) {
-if (!musicSet || musicSet.tracks.length > 0) return;
+  if (!musicSet || musicSet.tracks.length > 0) return;
 
-for (let path of musicSet.trackPaths || []) {
-musicSet.tracks.push(loadSound(path));
-}
+  for (let path of musicSet.trackPaths || []) {
+    musicSet.tracks.push(loadSound(path));
+  }
 }
 
 function syncLayeredMusicToProgress() {
-let musicSet = getCurrentLayeredMusicSet();
-if (!musicSet) return;
-ensureLayeredMusicSetLoaded(musicSet);
-if (musicSet.tracks.length === 0) return;
+  let musicSet = getCurrentLayeredMusicSet();
+  if (!musicSet) return;
+  ensureLayeredMusicSetLoaded(musicSet);
+  if (musicSet.tracks.length === 0) return;
 
-if (!musicEnabled) {
-muteLayeredMusic();
-return;
-}
+  if (!musicEnabled) {
+    muteLayeredMusic();
+    return;
+  }
 
-startLayeredMusicIfNeeded();
-if (!isLayeredMusicSetLoaded(musicSet)) return;
+  startLayeredMusicIfNeeded();
+  if (!isLayeredMusicSetLoaded(musicSet)) return;
 
-let activeCount = getUnlockedLayerCount(musicSet.tracks.length);
-layeredMusicActiveCount = activeCount;
+  let activeCount = getUnlockedLayerCount(musicSet.tracks.length);
+  layeredMusicActiveCount = activeCount;
 
-for (let i = 0; i < musicSet.tracks.length; i++) {
-let track = musicSet.tracks[i];
-if (!track) continue;
+  for (let i = 0; i < musicSet.tracks.length; i++) {
+    let track = musicSet.tracks[i];
+    if (!track) continue;
 
-let targetVolume = i < activeCount ? 0.75 : 0;
-track.setVolume(targetVolume, 0.25);
-}
+    let targetVolume = i < activeCount ? 0.75 : 0;
+    track.setVolume(targetVolume, 0.25);
+  }
 }
 
 function isLayeredMusicSetLoaded(musicSet) {
-for (let track of musicSet.tracks) {
-if (!track) return false;
-if (track.isLoaded && !track.isLoaded()) return false;
-}
+  for (let track of musicSet.tracks) {
+    if (!track) return false;
+    if (track.isLoaded && !track.isLoaded()) return false;
+  }
 
-return true;
+  return true;
 }
 
 function getUnlockedLayerCount(trackCount) {
-if (todoList.length <= 0 || trackCount <= 0) return 0;
+  if (todoList.length <= 0 || trackCount <= 0) return 0;
 
-let doneCount = countDone();
-if (doneCount <= 0) return 0;
-if (doneCount >= todoList.length) return trackCount;
+  let doneCount = countDone();
+  if (doneCount <= 0) return 0;
+  if (doneCount >= todoList.length) return trackCount;
 
-return constrain(ceil((doneCount / todoList.length) * trackCount), 1, trackCount);
+  return constrain(ceil((doneCount / todoList.length) * trackCount), 1, trackCount);
 }
 
 function muteLayeredMusic() {
-let musicSet = getCurrentLayeredMusicSet();
-if (!musicSet) return;
+  let musicSet = getCurrentLayeredMusicSet();
+  if (!musicSet) return;
 
-for (let track of musicSet.tracks) {
-if (track) {
-track.setVolume(0, 0.15);
-}
-}
+  for (let track of musicSet.tracks) {
+    if (track) {
+      track.setVolume(0, 0.15);
+    }
+  }
 }
 
 function stopLayeredMusic() {
-for (let musicSet of layeredMusicSets) {
-for (let track of musicSet.tracks) {
-if (track && track.isPlaying()) {
-track.stop();
-}
-}
-}
+  for (let musicSet of layeredMusicSets) {
+    for (let track of musicSet.tracks) {
+      if (track && track.isPlaying()) {
+        track.stop();
+      }
+    }
+  }
 
-layeredMusicStarted = false;
-layeredMusicActiveCount = 0;
+  layeredMusicStarted = false;
+  layeredMusicActiveCount = 0;
 }
