@@ -35,6 +35,12 @@ loadImage("images/4단계구.png"),
 loadImage("images/5단계구.png")
 ];
 
+loadLayeredMusicSets();
+
+for (let set of layeredMusicSets) {
+  ensureLayeredMusicSetLoaded(set);
+}
+
 }
 
 function loadSongSounds() {
