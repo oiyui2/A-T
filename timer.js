@@ -131,37 +131,38 @@ timerSec = 0;
 
 closeTimerPanelDOM();
 
-// 패널 크기 넓힘
-let pw = 520;
-let ph = 420;
+let pw = 560;
+let ph = 430;
 let px = width / 2 - pw / 2;
 let py = height / 2 - ph / 2;
 
 // 탭 버튼
-durationBtn = createButton("⏱ 타이머");
+durationBtn = createButton("TIMER");
 styleTimerTabBtn(durationBtn, true);
-durationBtn.position(px + 40, py + 34);
-durationBtn.size(200, 44);
+durationBtn.position(px + 48, py + 34);
+durationBtn.size(220, 42);
 durationBtn.mousePressed(function() {
 timerMode = "duration";
 updateTabStyle();
 });
 
-deadlineBtn = createButton("🕐 종료 시각");
+deadlineBtn = createButton("DEADLINE");
 styleTimerTabBtn(deadlineBtn, false);
-deadlineBtn.position(px + 280, py + 34);
-deadlineBtn.size(200, 44);
+deadlineBtn.position(px + 292, py + 34);
+deadlineBtn.size(220, 42);
 deadlineBtn.mousePressed(function() {
 timerMode = "deadline";
 updateTabStyle();
 });
 
 // 시 / 분 / 초 입력 그룹
-let rowY = py + 150;
+let rowY = py + 156;
 
-let hourX = px + 95;
-let minX = px + 260;
-let secX = px + 425;
+let groupGap = 156;
+let centerX = px + pw / 2;
+let hourX = centerX - groupGap;
+let minX = centerX;
+let secX = centerX + groupGap;
 
 // 시
 hourMinusBtn = createButton("-");
@@ -230,18 +231,18 @@ adjustTimerValue("sec", 10);
 });
 
 // 빠른 설정 버튼
-let quickY = py + 245;
+let quickY = py + 252;
 
-createQuickTimerButton("5분", 5 * 60, px + 55, quickY);
-createQuickTimerButton("15분", 15 * 60, px + 160, quickY);
-createQuickTimerButton("25분", 25 * 60, px + 265, quickY);
-createQuickTimerButton("50분", 50 * 60, px + 370, quickY);
+createQuickTimerButton("5분", 5 * 60, px + 76, quickY);
+createQuickTimerButton("15분", 15 * 60, px + 196, quickY);
+createQuickTimerButton("25분", 25 * 60, px + 316, quickY);
+createQuickTimerButton("50분", 50 * 60, px + 436, quickY);
 
 // 설정 버튼
-timerConfirmBtn = createButton("✓ 설정하기");
-styleButton(timerConfirmBtn, "#5cb85c");
-timerConfirmBtn.position(px + 150, py + 335);
-timerConfirmBtn.size(220, 54);
+timerConfirmBtn = createButton("SET TIMER");
+styleSciButton(timerConfirmBtn, "#5fffe0");
+timerConfirmBtn.position(px + 180, py + 356);
+timerConfirmBtn.size(200, 48);
 timerConfirmBtn.mousePressed(confirmTimerSetting);
 
 panelElements = [
@@ -272,51 +273,68 @@ quickButtons = [];
 }
 
 function drawTimerPanel() {
-let pw = 520;
-let ph = 420;
+let pw = 560;
+let ph = 430;
 let px = width / 2 - pw / 2;
 let py = height / 2 - ph / 2;
 
 noStroke();
-fill(0, 0, 0, 120);
+fill(0, 4, 12, 150);
 rect(0, 0, width, height);
 
-noStroke();
-fill(30, 15, 60, 245);
-rect(px, py, pw, ph, 22);
+drawingContext.shadowBlur = 28;
+drawingContext.shadowColor = "#5fffe0";
 
-stroke(160, 130, 220);
+noStroke();
+fill(5, 18, 34, 246);
+rect(px, py, pw, ph, 8);
+
+stroke(95, 255, 224, 185);
 strokeWeight(1.5);
 noFill();
-rect(px, py, pw, ph, 22);
+rect(px, py, pw, ph, 8);
+
+drawingContext.shadowBlur = 0;
+
+stroke(95, 255, 224, 135);
+strokeWeight(1);
+line(px + 24, py + 22, px + 118, py + 22);
+line(px + pw - 24, py + ph - 22, px + pw - 118, py + ph - 22);
 
 noStroke();
-fill(255);
+textFont("Orbitron");
+fill(235, 255, 252);
 textAlign(CENTER, CENTER);
-textSize(22);
-text("타이머 설정", px + pw / 2, py - 28);
+textStyle(BOLD);
+textSize(24);
+text("TIME MODULE", px + pw / 2, py - 28);
 
-fill(190, 175, 230);
+textStyle(NORMAL);
+textFont("Share Tech Mono");
+fill(160, 255, 238);
 textSize(14);
-text("완료할 시간을 정하면 체크리스트와 연결됩니다.", px + pw / 2, py + 105);
+text("Link focus time to the selected mission.", px + pw / 2, py + 105);
 
 // 시 / 분 / 초 라벨
-fill(220, 200, 255);
+fill(220, 255, 248);
 textSize(15);
 
-text("시", px + 135, py + 135);
-text("분", px + 300, py + 135);
-text("초", px + 465, py + 135);
+text("시", px + pw / 2 - 116, py + 138);
+text("분", px + pw / 2 + 40, py + 138);
+text("초", px + pw / 2 + 196, py + 138);
 
 // 하단 설명
-fill(180, 160, 220);
+fill(150, 220, 232);
 textSize(12);
 
 if (timerMode === "duration") {
-text("예: 25분 동안 집중하기", px + pw / 2, py + ph - 78);
+text("Example: 25 minutes of focused orbit.", px + pw / 2, py + ph - 94);
 } else {
-text("입력한 오늘의 시각까지 자동 카운트다운됩니다.", px + pw / 2, py + ph - 78);
+text("Countdown runs until today's selected time.", px + pw / 2, py + ph - 94);
 }
+
+textFont("sans-serif");
+textStyle(NORMAL);
 }
 function confirmTimerSetting() {
 readTimerInputs();
@@ -460,12 +478,15 @@ startFrame: frameCount
 function styleTimerTabBtn(btn, active) {
 btn.style("font-size", "13px");
 btn.style("padding", "8px 14px");
-btn.style("border", "none");
-btn.style("border-radius", "8px");
+btn.style("border", "1.3px solid rgba(95,255,224,0.78)");
+btn.style("border-radius", "4px");
 btn.style("cursor", "pointer");
-btn.style("font-weight", "bold");
-btn.style("color", "white");
-btn.style("background", active ? "#7c5cbf" : "#3a2a5a");
+btn.style("font-weight", "700");
+btn.style("font-family", "'Share Tech Mono', monospace");
+btn.style("letter-spacing", "1px");
+btn.style("color", active ? "#ffffff" : "#9fffee");
+btn.style("background", active ? "rgba(95,255,224,0.22)" : "rgba(4,18,32,0.82)");
+btn.style("box-shadow", active ? "0 0 16px rgba(95,255,224,0.70), inset 0 0 14px rgba(95,255,224,0.20)" : "inset 0 0 12px rgba(95,255,224,0.08)");
 addHoverEffect(btn, 1.05);
 }
 
@@ -473,11 +494,13 @@ function styleTimerInput(inp) {
 inp.style("font-size", "18px");
 inp.style("text-align", "center");
 inp.style("padding", "4px");
-inp.style("border", "2px solid #7c5cbf");
-inp.style("border-radius", "8px");
-inp.style("background", "rgba(255,255,255,0.95)");
-inp.style("color", "#222");
+inp.style("border", "1.5px solid rgba(95,255,224,0.88)");
+inp.style("border-radius", "4px");
+inp.style("background", "rgba(2, 12, 24, 0.92)");
+inp.style("color", "#5fffe0");
 inp.style("outline", "none");
+inp.style("font-family", "'Share Tech Mono', monospace");
+inp.style("box-shadow", "inset 0 0 12px rgba(95,255,224,0.18)");
 inp.attribute("type", "number");
 inp.attribute("min", "0");
 }
@@ -486,12 +509,13 @@ function styleStepperButton(btn) {
 btn.style("font-size", "20px");
 btn.style("width", "34px");
 btn.style("height", "36px");
-btn.style("border", "none");
-btn.style("border-radius", "8px");
-btn.style("background", "#3a2a5a");
-btn.style("color", "white");
+btn.style("border", "1.2px solid rgba(95,255,224,0.8)");
+btn.style("border-radius", "4px");
+btn.style("background", "rgba(4,18,32,0.82)");
+btn.style("color", "#5fffe0");
 btn.style("cursor", "pointer");
 btn.style("font-weight", "bold");
+btn.style("box-shadow", "inset 0 0 10px rgba(95,255,224,0.12)");
 addHoverEffect(btn, 1.12);
 }
 
@@ -500,12 +524,14 @@ let btn = createButton(label);
 
 btn.style("font-size", "13px");
 btn.style("padding", "8px 12px");
-btn.style("border", "none");
-btn.style("border-radius", "999px");
-btn.style("background", "#6b4aa0");
-btn.style("color", "white");
+btn.style("border", "1.2px solid rgba(180,124,255,0.8)");
+btn.style("border-radius", "4px");
+btn.style("background", "rgba(18,14,42,0.86)");
+btn.style("color", "#d6c2ff");
 btn.style("cursor", "pointer");
 btn.style("font-weight", "bold");
+btn.style("font-family", "'Share Tech Mono', monospace");
+btn.style("box-shadow", "inset 0 0 10px rgba(180,124,255,0.14)");
 btn.position(x, y);
 btn.size(58, 34);
 
@@ -589,7 +615,16 @@ if (secInput) secInput.value(timerSec);
 
 function updateTabStyle() {
 if (durationBtn && deadlineBtn) {
-durationBtn.style("background", timerMode === "duration" ? "#7c5cbf" : "#3a2a5a");
-deadlineBtn.style("background", timerMode === "deadline" ? "#7c5cbf" : "#3a2a5a");
+let activeBg = "rgba(95,255,224,0.22)";
+let idleBg = "rgba(4,18,32,0.82)";
+let activeShadow = "0 0 16px rgba(95,255,224,0.70), inset 0 0 14px rgba(95,255,224,0.20)";
+let idleShadow = "inset 0 0 12px rgba(95,255,224,0.08)";
+
+durationBtn.style("background", timerMode === "duration" ? activeBg : idleBg);
+deadlineBtn.style("background", timerMode === "deadline" ? activeBg : idleBg);
+durationBtn.style("color", timerMode === "duration" ? "#ffffff" : "#9fffee");
+deadlineBtn.style("color", timerMode === "deadline" ? "#ffffff" : "#9fffee");
+durationBtn.style("box-shadow", timerMode === "duration" ? activeShadow : idleShadow);
+deadlineBtn.style("box-shadow", timerMode === "deadline" ? activeShadow : idleShadow);
 }
 }
