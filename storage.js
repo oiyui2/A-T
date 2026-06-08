@@ -10,7 +10,10 @@ function saveProgress() {
   let saveData = {
     todoList: todoList,
     selectedCharacterIndex: selectedCharacterIndex,
-    rewardClaimed: rewardClaimed
+    rewardClaimed: rewardClaimed,
+    currentLayeredMusicSetIndex: currentLayeredMusicSetIndex,
+    characterLogs: characterLogs,
+    completionSequence: completionSequence
   };
 
   localStorage.setItem(getUserKey("twoDoProgress"), JSON.stringify(saveData));
@@ -29,6 +32,12 @@ function loadProgress() {
   todoList = saveData.todoList || [];
   selectedCharacterIndex = saveData.selectedCharacterIndex || 0;
   rewardClaimed = saveData.rewardClaimed || false;
+  characterLogs = saveData.characterLogs || [];
+  completionSequence = saveData.completionSequence || getMaxCompletedOrder();
+  currentLayeredMusicSetIndex =
+    saveData.currentLayeredMusicSetIndex !== undefined
+      ? saveData.currentLayeredMusicSetIndex
+      : inventoryCount % max(layeredMusicSets.length, 1);
 
   normalizeTodoTimers();
 
@@ -56,21 +65,41 @@ function normalizeTodoTimers() {
     if (todo.timer.running) {
       todo.timer.running = false;
     }
+
+    if (todo.completedOrder === undefined) {
+      todo.completedOrder = todo.done ? getMaxCompletedOrder() + 1 : null;
+    }
   }
+}
+
+function getMaxCompletedOrder() {
+  let maxOrder = 0;
+
+  for (let todo of todoList) {
+    if (todo.completedOrder && todo.completedOrder > maxOrder) {
+      maxOrder = todo.completedOrder;
+    }
+  }
+
+  return maxOrder;
 }
 
 function saveInventory() {
   localStorage.setItem(getUserKey("twoDoInventoryCount"), inventoryCount);
+  localStorage.setItem(getUserKey("twoDoExplorationRecords"), JSON.stringify(explorationRecords));
 }
 
 function loadInventory() {
   let savedCount = localStorage.getItem(getUserKey("twoDoInventoryCount"));
+  let savedRecords = localStorage.getItem(getUserKey("twoDoExplorationRecords"));
 
   if (savedCount === null) {
     inventoryCount = 0;
   } else {
     inventoryCount = int(savedCount);
   }
+
+  explorationRecords = savedRecords ? JSON.parse(savedRecords) : [];
 }
 
 function restartProgram() {
@@ -81,6 +110,12 @@ function restartProgram() {
   finalBurst = 0;
   characterAnimating = true;
   currentSongIndex = -1;
+  currentLayeredMusicSetIndex = inventoryCount % max(layeredMusicSets.length, 1);
+  layeredMusicStarted = false;
+  layeredMusicActiveCount = 0;
+  characterLogs = [];
+  activeSpeechText = "";
+  completionSequence = 0;
   timerPanelOpen = false;
   timerPanelIndex = -1;
   penaltyList = [];
@@ -103,6 +138,14 @@ function resetAllData() {
   finalBurst = 0;
   characterAnimating = true;
   currentSongIndex = -1;
+  currentLayeredMusicSetIndex = 0;
+  layeredMusicStarted = false;
+  layeredMusicActiveCount = 0;
+  characterLogs = [];
+  activeSpeechText = "";
+  completionSequence = 0;
+  explorationRecords = [];
+  dexPopupRecordIndex = -1;
   timerPanelOpen = false;
   timerPanelIndex = -1;
   penaltyList = [];
@@ -112,6 +155,7 @@ function resetAllData() {
 
   localStorage.removeItem(getUserKey("twoDoProgress"));
   localStorage.removeItem(getUserKey("twoDoInventoryCount"));
+  localStorage.removeItem(getUserKey("twoDoExplorationRecords"));
 
   currentPage = "input";
   showOnlyInputUI();
