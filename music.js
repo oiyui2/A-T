@@ -212,6 +212,7 @@ function handleMusicClick() {
       }
 
       playSong(i);
+      playValidClickSound();
       return;
     }
   }
@@ -258,7 +259,11 @@ function playSong(index) {
     track.setVolume(0.75);
 
     if (!track.isPlaying()) {
-      track.loop(0, 1, 0.75, 0, musicSet.loopSec);
+      if (musicSet.loopSec) {
+        track.loop(0, 1, 0.75, 0, musicSet.loopSec);
+      } else {
+        track.loop(0, 1, 0.75);
+      }
     }
   }
 
@@ -272,8 +277,61 @@ function stopAllSongs() {
     }
   }
 
+  stopHomeMusic();
   stopLayeredMusic();
   currentSongIndex = -1;
+}
+
+function playValidClickSound() {
+  if (!musicEnabled || !clickSound) return;
+  if (clickSound.isLoaded && !clickSound.isLoaded()) return;
+
+  if (typeof userStartAudio === "function") {
+    userStartAudio();
+  }
+
+  clickSound.setVolume(0.7);
+  if (clickSound.isPlaying()) {
+    clickSound.stop();
+  }
+  clickSound.play();
+}
+
+function updateHomeMusicForPage() {
+  if (
+    currentPage === "intro" ||
+    currentPage === "radar" ||
+    currentPage === "login" ||
+    currentPage === "input"
+  ) {
+    startHomeMusic();
+  } else {
+    stopHomeMusic();
+  }
+}
+
+function startHomeMusic() {
+  if (!musicEnabled || !homeMusicSound) {
+    stopHomeMusic();
+    return;
+  }
+
+  if (homeMusicSound.isLoaded && !homeMusicSound.isLoaded()) return;
+
+  if (typeof userStartAudio === "function") {
+    userStartAudio();
+  }
+
+  homeMusicSound.setVolume(0.55);
+  if (!homeMusicSound.isPlaying()) {
+    homeMusicSound.loop();
+  }
+}
+
+function stopHomeMusic() {
+  if (homeMusicSound && homeMusicSound.isPlaying()) {
+    homeMusicSound.stop();
+  }
 }
 
 // ============================================================
@@ -313,7 +371,11 @@ function startLayeredMusicIfNeeded() {
 
     if (!track.isPlaying()) {
       track.setVolume(0);
-      track.loop(0, 1, 0, 0, musicSet.loopSec);
+      if (musicSet.loopSec) {
+        track.loop(0, 1, 0, 0, musicSet.loopSec);
+      } else {
+        track.loop(0, 1, 0);
+      }
     }
   }
 
