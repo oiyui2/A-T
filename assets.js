@@ -35,14 +35,62 @@ loadImage("images/4단계구.png"),
 loadImage("images/5단계구.png")
 ];
 
-songSounds[0] = loadSound("sounds/2do3-BigRideEdit_140_SnareSplash_FX_4bars.wav");
-songSounds[1] = loadSound("sounds/song2.mp3");
-songSounds[2] = loadSound("sounds/song3.mp3");
-songSounds[3] = loadSound("sounds/song4.mp3");
-songSounds[4] = loadSound("sounds/song5.mp3");
-songSounds[5] = loadSound("sounds/song6.mp3");
 }
 
-// ============================================================
-// setup
-// ============================================================
+function loadSongSounds() {
+songSounds[0] = loadSound("sounds/2do3-BigRideEdit_140_SnareSplash_FX_4bars.wav");
+}
+
+function loadLayeredMusicSets() {
+layeredMusicSets = [
+{
+name: "2do1",
+loopSec: 29.5,
+tracks: [
+],
+trackPaths: [
+"sounds/2do1 - 1.synth.wav",
+"sounds/2do1 - 2.piano line.wav",
+"sounds/2do1 - 3.wav",
+"sounds/2do1 - 4.wav",
+"sounds/2do1 - 5.fx.wav",
+"sounds/2do1 - 6.Rain_FX.wav",
+"sounds/2do1 - 7.wav",
+"sounds/2do1 - 8.wav",
+"sounds/2do1 - 9.piano.code.wav"
+]
+},
+{
+name: "2do2",
+loopSec: 115.2,
+tracks: [
+],
+trackPaths: [
+"sounds/2do2 - 1.synthline.wav",
+"sounds/2do2 - 2.noise.wav",
+"sounds/2do2 - 3.code.wav",
+"sounds/2do2 - 4.subline.wav",
+"sounds/2do2 - 5.choir.wav",
+"sounds/2do2 - 6.noise.wav",
+"sounds/2do2 - 7.beat.wav",
+"sounds/2do2 - 8.wav"
+]
+},
+{
+name: "2do3",
+loopSec: 32,
+tracks: [
+],
+trackPaths: [
+"sounds/2do3-BigRideEdit_140_SnareSplash_FX_4bars.wav",
+"sounds/2do3- Instrument.wav",
+"sounds/2do3- Instrument 2.wav",
+"sounds/2do3 - Instrument 3.wav",
+"sounds/2do3- Instrument 4.wav",
+"sounds/2do3- MAB_80_C%23min_ReverseKey_03_1bar.wav",
+"sounds/2do3- Voice_Audio 3.wav",
+"sounds/2do3- Voice_Audio 4.wav"
+]
+}
+];
+}
