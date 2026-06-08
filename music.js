@@ -161,7 +161,8 @@ function drawSongRow(i) {
   textAlign(LEFT, CENTER);
   textSize(18);
   fill(canPlay ? color(235, 255, 252) : color(160, 160, 180));
-  text("[ SIGNAL " + nf(i + 1, 2) + " ]  " + song.title, rowX + 75, y);
+  let displayName = layeredMusicSets[i] ? layeredMusicSets[i].name : song.title;
+  text("[ SIGNAL " + nf(i + 1, 2) + " ]  " + displayName, rowX + 75, y);
 
   // 필요 캐릭터
   textAlign(CENTER, CENTER);
@@ -218,7 +219,7 @@ function handleMusicClick() {
 
 function playSong(index) {
   if (!musicEnabled) {
-    console.log("곡 재생이 꺼져 있습니다. (상단/하단 토글로 켜기)");
+    console.log("AUDIO OFF");
     return;
   }
 
@@ -226,23 +227,37 @@ function playSong(index) {
     userStartAudio();
   }
 
-  stopLayeredMusic();
+  stopAllSongs();
+  currentSongIndex = index;
 
-  for (let i = 0; i < songSounds.length; i++) {
-    if (songSounds[i] && songSounds[i].isPlaying()) {
-      songSounds[i].stop();
+  let musicSet = layeredMusicSets[index];
+
+  if (!musicSet) {
+    console.log("해당 음악 세트가 없습니다.");
+    return;
+  }
+
+  ensureLayeredMusicSetLoaded(musicSet);
+
+  if (!isLayeredMusicSetLoaded(musicSet)) {
+    console.log("음악 파일 로딩 중입니다. 잠시 후 다시 눌러주세요.");
+    return;
+  }
+
+  for (let i = 0; i < musicSet.tracks.length; i++) {
+    let track = musicSet.tracks[i];
+    if (!track) continue;
+
+    track.setVolume(0.75);
+
+    if (!track.isPlaying()) {
+      track.loop(0, 1, 0.75, 0, musicSet.loopSec);
     }
   }
 
-  currentSongIndex = index;
-
-  if (songSounds[index]) {
-    songSounds[index].play();
-  } else {
-    console.log("음악 파일이 아직 없습니다. 표시만 변경합니다.");
-  }
+  layeredMusicStarted = true;
+  layeredMusicActiveCount = musicSet.tracks.length;
 }
-
 function stopAllSongs() {
   for (let i = 0; i < songSounds.length; i++) {
     if (songSounds[i] && songSounds[i].isPlaying()) {
